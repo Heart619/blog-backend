@@ -2,7 +2,7 @@ package com.example.blog2.service.impl;
 
 import com.example.blog2.dao.ProjectRepository;
 import com.example.blog2.po.Project;
-import com.example.blog2.service.PicturesService;
+import com.example.blog2.service.old.PicturesService;
 import com.example.blog2.service.ProjectService;
 import com.example.blog2.utils.MyBeanUtils;
 import org.springframework.beans.BeanUtils;
@@ -23,7 +23,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    @Autowired
+//    @Autowired
     private PicturesService picturesService;
 
     @Override

@@ -28,7 +28,7 @@ public class EssayController {
      * 列表
      */
     @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestBody Map<String, Object> params){
         PageUtils page = essayService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -82,7 +82,7 @@ public class EssayController {
 
     @GetMapping("/{id}/delete")
     public R delEssay(@PathVariable("id") Long id) {
-        essayService.removeById(id);
+        essayService.delEssayById(id);
         return R.ok();
     }
 }

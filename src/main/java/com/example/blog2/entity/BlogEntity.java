@@ -99,4 +99,7 @@ public class BlogEntity implements Serializable {
 
 	@TableField(exist = false)
 	private List<TagEntity> tags;
+
+	@TableField(exist = false)
+	private String tagIds;
 }

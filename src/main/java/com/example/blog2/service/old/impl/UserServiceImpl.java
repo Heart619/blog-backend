@@ -2,12 +2,10 @@ package com.example.blog2.service.old.impl;
 
 import com.example.blog2.dao.UserRepository;
 import com.example.blog2.po.User;
-import com.example.blog2.service.PicturesService;
+import com.example.blog2.service.old.PicturesService;
 import com.example.blog2.service.old.UserService;
 import com.example.blog2.utils.MyBeanUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;

@@ -3,6 +3,7 @@ package com.example.blog2.dao;
 import com.example.blog2.entity.BlogEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -82,4 +83,13 @@ public interface BlogDao extends BaseMapper<BlogEntity> {
      * @return
      */
     List<BlogEntity> selectCondition(String query);
+
+    /**
+     * 更新阅读量
+     * @param id
+     * @param oldv
+     * @param i
+     * @return
+     */
+    int updateViews(@Param("id") Long id, @Param("oldv") int oldv, @Param("i") int i);
 }

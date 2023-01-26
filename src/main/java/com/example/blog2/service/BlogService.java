@@ -1,10 +1,13 @@
 package com.example.blog2.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.blog2.entity.TagEntity;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.entity.BlogEntity;
 import com.example.blog2.utils.R;
+import com.example.blog2.vo.DelBlogTagVo;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -81,5 +84,57 @@ public interface BlogService extends IService<BlogEntity> {
      * @return
      */
     List<BlogEntity> search(String query);
+
+    /**
+     * 删除博客
+     * @param id
+     */
+    void delBlog(Long id) throws ExecutionException, InterruptedException;
+
+    /**
+     * 修改博客首图
+     * @param blog
+     */
+    void updateImg(BlogEntity blog);
+
+    /**
+     * 获得博客默认信息
+     * @param id
+     * @return
+     */
+    BlogEntity getDefaultBlogInfo(Long id);
+
+    /**
+     * 更新博客内容
+     * @param blog
+     */
+    void updateBlog(BlogEntity blog);
+
+    /**
+     * 新增博客
+     * @param blog
+     * @return
+     */
+    boolean addBlog(BlogEntity blog) throws ExecutionException, InterruptedException;
+
+    /**
+     * 修改博客类型
+     * @param blog
+     */
+    void updateType(BlogEntity blog);
+
+    /**
+     * 删除博客标签
+     * @param vo
+     */
+    void delTag(DelBlogTagVo vo);
+
+    /**
+     * 创建标签
+     * @param id
+     * @param name
+     * @return
+     */
+    TagEntity createTag(Long id, String name);
 }
 

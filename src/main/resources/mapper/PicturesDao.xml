@@ -7,8 +7,14 @@
     <resultMap type="com.example.blog2.entity.PicturesEntity" id="picturesMap">
         <result property="id" column="id"/>
         <result property="image" column="image"/>
-        <result property="isUse" column="is_use"/>
+        <result property="belong" column="belong"/>
+        <result property="type" column="type"/>
     </resultMap>
+    <update id="updateOldPicturesByLongId">
+        update t_pictures
+        set belong = #{blogId}, type = #{type}
+        where belong = #{lid}
+    </update>
 
 
 </mapper>

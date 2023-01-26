@@ -1,19 +1,23 @@
 package com.example.blog2.service.impl;
 
 import com.example.blog2.config.OSSConfig;
-import com.example.blog2.utils.MyBeanUtils;
+import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.entity.UserEntity;
+import com.example.blog2.service.UserService;
+import com.example.blog2.service.PicturesService;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,6 +25,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.blog2.dao.EssayDao;
 import com.example.blog2.entity.EssayEntity;
 import com.example.blog2.service.EssayService;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -35,13 +44,40 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
     @Autowired
     private OSSConfig ossConfig;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PicturesService picturesService;
+
+    @Autowired
+    private ThreadPoolExecutor executor;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<EssayEntity> queryWrapper = new QueryWrapper<>();
+
+        Object userId = params.get("userId");
+        if (userId != null) {
+            queryWrapper.eq("author", userId);
+        }
+
+        queryWrapper.orderByDesc("create_time");
         IPage<EssayEntity> page = this.page(
                 new Query<EssayEntity>().getPage(params),
-                new QueryWrapper<EssayEntity>().orderByDesc("create_time")
+                queryWrapper
         );
 
+        Map<Long, UserEntity> map = userService.getUserAvatarAndNickName().stream().collect(Collectors.toMap(UserEntity::getId, x -> x));
+
+        page.getRecords().forEach(x -> {
+            x.setContent(new String(ossUtils.load(x.getContent()), StandardCharsets.UTF_8));
+            UserEntity user = map.get(x.getAuthor());
+            if (user != null) {
+                x.setNickName(user.getNickname());
+                x.setAvatar(user.getAvatar());
+            }
+        });
         return new PageUtils(page);
     }
 
@@ -52,17 +88,59 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
             old = getById(essay.getId());
         }
 
+
         if (old != null) {
             String k = old.getContent();
-            BeanUtils.copyProperties(essay, old, MyBeanUtils.getNullPropertyNames(old));
-            ossUtils.delText(k);
-            ossUtils.uploadText(k, old.getContent().getBytes(StandardCharsets.UTF_8));
-            this.updateById(old);
+            ossUtils.del(k);
+            String[] split = k.split("/");
+            if (split.length > 3) {
+                k = ossConfig.getEssay() + split[2] + "/" + UUID.randomUUID();
+            }
+            essay.setContent(ossUtils.upload(k, essay.getContent().getBytes(StandardCharsets.UTF_8)));
+            this.updateById(essay);
         } else {
-            ossUtils.uploadText(ossConfig.getEssay() + LocalDate.now() + "/" + essay.getTitle(), essay.getContent().getBytes(StandardCharsets.UTF_8));
+            String k = ossConfig.getEssay() + LocalDate.now() + "/" + UUID.randomUUID();
+            ossUtils.upload(k, essay.getContent().getBytes(StandardCharsets.UTF_8));
             essay.setCreateTime(new Date());
+            essay.setContent(k);
             this.save(essay);
         }
+
+        CompletableFuture.runAsync(() -> {
+            updatePictureBelongEssay(essay.getId());
+        }, executor);
+    }
+
+    /**
+     * 更新图片所属随笔
+     * @param essay
+     */
+    private void updatePictureBelongEssay(Long essay) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null && cookies.length > 0) {
+            Cookie c = null;
+            for (Cookie cookie : cookies) {
+                if (ConstantImg.IMG_COOKIE_NAME.equals(cookie.getName())) {
+                    c = cookie;
+                    break;
+                }
+            }
+            if (c != null) {
+                long id = Long.parseLong(c.getValue());
+                picturesService.updateOldPicturesByLongId(id, essay, 0);
+            }
+        }
+    }
+
+
+    @Override
+    public void delEssayById(Long id) {
+        EssayEntity essay = getById(id);
+        ossUtils.del(essay.getContent());
+        removeById(id);
     }
 
 }

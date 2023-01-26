@@ -2,7 +2,7 @@ package com.example.blog2.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.example.blog2.po.User;
+import com.example.blog2.entity.UserEntity;
 
 import java.util.Date;
 
@@ -16,15 +16,17 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class TokenUtil {
 
-    private static final long EXPIRE_TIME= 10*60*60*1000;
-    private static final String TOKEN_SECRET="Hikari20210714";  //密钥盐
+    private static final long EXPIRE_TIME= 10 * 60 * 60 * 1000;
+
+    //密钥盐
+    private static final String TOKEN_SECRET = "QIUQIULQXIANGQUDACHANG";
 
     /**
      * 签名生成
      * @param user
      * @return
      */
-    public static String sign(User user){
+    public static String sign(UserEntity user){
         String token = null;
         try {
             Date expiresAt = new Date(System.currentTimeMillis() + EXPIRE_TIME);

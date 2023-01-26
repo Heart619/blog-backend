@@ -8,8 +8,8 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * 
- * 
+ *
+ *
  * @author mxp
  * @email mxp@gmail.com
  * @date 2023-01-25 09:47:20
@@ -20,17 +20,24 @@ public class PicturesEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	@TableId
 	private Long id;
 	/**
-	 * 
+	 *
 	 */
 	private String image;
-	/**
-	 * 
-	 */
-	private Boolean isUse;
 
+	/**
+	 *
+	 */
+	private Long belong;
+
+	/**
+	 * 0 - essay
+	 * 1 - blog
+	 * 2 - other
+	 */
+	private Integer type;
 }

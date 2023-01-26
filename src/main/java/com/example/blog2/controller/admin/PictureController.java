@@ -27,7 +27,7 @@ import java.util.UUID;
  * @date 2021/7/5 21:14
  */
 @Slf4j
-@RestController
+//@RestController
 public class PictureController {
 
     @Autowired

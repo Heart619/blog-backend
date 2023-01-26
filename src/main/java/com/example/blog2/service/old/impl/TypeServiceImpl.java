@@ -4,7 +4,7 @@
 //import com.example.blog2.dao.TypeRepository;
 //import com.example.blog2.po.Blog;
 //import com.example.blog2.po.Type;
-//import com.example.blog2.service.PicturesService;
+//import com.example.blog2.service.old.PicturesService;
 //import com.example.blog2.service.TypeService;
 //import com.example.blog2.utils.MyBeanUtils;
 //import org.springframework.beans.BeanUtils;

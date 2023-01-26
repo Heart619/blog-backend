@@ -3,7 +3,7 @@ package com.example.blog2.controller.admin;
 import com.example.blog2.po.Pictures;
 import com.example.blog2.po.Result;
 import com.example.blog2.po.StatusCode;
-import com.example.blog2.service.PicturesService;
+import com.example.blog2.service.old.PicturesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ import java.util.Map;
  * @author mxp
  * @date 2023/1/24 19:27
  */
-@RestController
+//@RestController
 public class PicturesController {
 
     @Autowired

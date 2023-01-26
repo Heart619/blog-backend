@@ -95,7 +95,7 @@ public class TypeController {
             TypeEntity type = typeService.getById(id);
             typeService.removeById(id);
             if (!StringUtils.isEmpty(type.getPicUrl())) {
-                ossUtils.delText(type.getPicUrl());
+                ossUtils.del(type.getPicUrl());
             }
             return R.ok("删除成功");
         } catch (Exception e) {

@@ -37,7 +37,7 @@ public class EssayServiceImpl implements EssayService {
     public List<Essay> listEssay() {
         List<Essay> res = essayRepository.findAll();
         res.forEach(x -> {
-            x.setContent(new String(OSSUtils.loadText(x.getContent()), StandardCharsets.UTF_8));
+            x.setContent(new String(OSSUtils.load(x.getContent()), StandardCharsets.UTF_8));
         });
         return res;
     }
@@ -46,7 +46,7 @@ public class EssayServiceImpl implements EssayService {
     public void deleteEssay(Long id) {
         Essay essay = essayRepository.getOne(id);
         if (!StringUtils.isEmpty(essay.getContent())) {
-            OSSUtils.delText(essay.getContent());
+            OSSUtils.del(essay.getContent());
         }
         essayRepository.deleteById(id);
     }
@@ -56,7 +56,7 @@ public class EssayServiceImpl implements EssayService {
         essay.setCreateTime(new Date());
         byte[] bytes = essay.getContent().getBytes(StandardCharsets.UTF_8);
         String k = ossConfig.getEssay() + LocalDate.now() + "/" + essay.getTitle();
-        essay.setContent(OSSUtils.uploadText(k, bytes));
+        essay.setContent(OSSUtils.upload(k, bytes));
         return essayRepository.save(essay);
     }
 
@@ -66,8 +66,8 @@ public class EssayServiceImpl implements EssayService {
         String t = e.getContent();
         BeanUtils.copyProperties(essay, e, MyBeanUtils.getNullPropertyNames(essay));
         if (!StringUtils.isEmpty(essay.getContent())) {
-            OSSUtils.delText(t);
-            OSSUtils.uploadText(t, essay.getContent().getBytes(StandardCharsets.UTF_8));
+            OSSUtils.del(t);
+            OSSUtils.upload(t, essay.getContent().getBytes(StandardCharsets.UTF_8));
             e.setContent(t);
         }
         return essayRepository.save(e);

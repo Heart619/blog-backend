@@ -21,10 +21,7 @@ import com.example.blog2.service.CommentService;
 
 
 /**
- *
- *
  * @author mxp
- * @email mxp@gmail.com
  * @date 2023-01-25 09:47:20
  */
 @RestController
@@ -104,18 +101,6 @@ public class CommentController {
         } catch (Exception e) {
             return R.error("网络繁忙，请稍后再试");
         }
-    }
-
-    @GetMapping("/getBlogComment/{id}")
-    public R getBlogComments(@PathVariable("id") Long id) {
-        List<CommentEntity> commentEntities;
-        try {
-            commentEntities = commentService.getBlogComments(id);
-            return R.ok().put("data", commentEntities);
-        } catch (Exception e) {
-            return R.error("网络繁忙，请稍后再试");
-        }
-
     }
 
     @GetMapping("/new/comments")

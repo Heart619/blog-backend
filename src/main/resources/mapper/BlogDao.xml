@@ -22,6 +22,11 @@
         <result property="typeId" column="type_id"/>
         <result property="userId" column="user_id"/>
     </resultMap>
+    <update id="updateViews">
+        update t_blog set
+        views = #{i}
+        where id = #{id} and views = #{oldv}
+    </update>
 
     <select id="selectAllBlogTypeId" resultType="java.lang.Long">
         select type_id from t_blog

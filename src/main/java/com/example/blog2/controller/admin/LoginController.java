@@ -1,5 +1,6 @@
 package com.example.blog2.controller.admin;
 
+import com.example.blog2.entity.UserEntity;
 import com.example.blog2.po.Result;
 import com.example.blog2.po.StatusCode;
 import com.example.blog2.po.User;
@@ -32,7 +33,7 @@ public class LoginController {
         String password = (String) para.get("password");
         User user = userService.checkUser(username, password);
         if (user != null) {
-            String token = TokenUtil.sign(user);
+            String token = TokenUtil.sign(new UserEntity());
             Map<String,Object> info = new HashMap<>();
             info.put("user",user);
             info.put("token",token);

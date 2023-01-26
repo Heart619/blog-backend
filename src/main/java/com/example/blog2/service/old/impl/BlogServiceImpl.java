@@ -5,19 +5,17 @@ import com.example.blog2.dao.BlogRepository;
 import com.example.blog2.po.Blog;
 import com.example.blog2.po.Type;
 import com.example.blog2.service.old.BlogService;
-import com.example.blog2.service.PicturesService;
+import com.example.blog2.service.old.PicturesService;
 import com.example.blog2.utils.MarkdownUtils;
 import com.example.blog2.utils.MyBeanUtils;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.vo.BlogQuery;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
@@ -131,7 +129,7 @@ public class BlogServiceImpl implements BlogService {
         String content = blog.getContent();
         byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
         String k = ossConfig.getBlog() + LocalDate.now() + "/" + blog.getTitle();
-        String key = OSSUtils.uploadText(k, bytes);
+        String key = OSSUtils.upload(k, bytes);
         blog.setContent(key);
         return blogRepository.save(blog);
     }
@@ -147,8 +145,8 @@ public class BlogServiceImpl implements BlogService {
         }
         if (!StringUtils.isEmpty(blog.getContent())) {
             byte[] bytes = b.getContent().getBytes(StandardCharsets.UTF_8);
-            OSSUtils.delText(k);
-            OSSUtils.uploadText(k, bytes);
+            OSSUtils.del(k);
+            OSSUtils.upload(k, bytes);
             b.setContent(k);
         }
         b.setUpdateTime(new Date());
@@ -162,7 +160,7 @@ public class BlogServiceImpl implements BlogService {
         if (!StringUtils.isEmpty(blog.getFirstPicture()) && !blog.getFirstPicture().equals(blog.getType().getPic_url())) {
             picturesService.delOssImg(blog.getFirstPicture());
         }
-        OSSUtils.delText(blog.getContent());
+        OSSUtils.del(blog.getContent());
         blogRepository.deleteById(id);
     }
 
@@ -173,7 +171,7 @@ public class BlogServiceImpl implements BlogService {
         blog = blogRepository.save(blog);
         Blog b = new Blog();
         BeanUtils.copyProperties(blog,b);
-        byte[] bytes = OSSUtils.loadText(b.getContent());
+        byte[] bytes = OSSUtils.load(b.getContent());
         b.setContent(MarkdownUtils.markdownToHtmlExtensions(new String(bytes, StandardCharsets.UTF_8)));
         return b;
     }
@@ -181,7 +179,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public Blog getSimpleBlog(Long id) {
         Blog blog = blogRepository.getOne(id);
-        byte[] bytes = OSSUtils.loadText(blog.getContent());
+        byte[] bytes = OSSUtils.load(blog.getContent());
         blog.setContent(new String(bytes, StandardCharsets.UTF_8));
         return blog;
     }

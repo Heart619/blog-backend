@@ -1,8 +1,10 @@
 package com.example.blog2.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.example.blog2.entity.TypeEntity;
 import com.example.blog2.po.Result;
 import com.example.blog2.po.StatusCode;
 import com.example.blog2.service.TagService;

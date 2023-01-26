@@ -4,13 +4,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.example.blog2.entity.TagEntity;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
+import com.example.blog2.vo.DelBlogTagVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.blog2.entity.BlogEntity;
 import com.example.blog2.service.BlogService;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -51,9 +55,14 @@ public class BlogController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody BlogEntity blog){
-		blogService.save(blog);
-
-        return R.ok();
+        try {
+            if (blogService.addBlog(blog)) {
+                return R.ok();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return R.error();
     }
 
     /**
@@ -61,9 +70,13 @@ public class BlogController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody BlogEntity blog){
-		blogService.updateById(blog);
-
-        return R.ok();
+        try {
+            blogService.updateBlog(blog);
+            return R.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error();
+        }
     }
 
     /**
@@ -76,9 +89,20 @@ public class BlogController {
         return R.ok();
     }
 
+    @GetMapping("/{id}/delete")
+    public R delBlog(@PathVariable("id") Long id) {
+        try {
+            blogService.delBlog(id);
+            return R.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error();
+        }
+    }
+
     @GetMapping("/{blog}")
     public R bolgInfo(@PathVariable("blog") Long id) {
-        BlogEntity blog = null;
+        BlogEntity blog;
         try {
             blog = blogService.getBlogInfo(id);
             if (blog == null) {
@@ -88,6 +112,65 @@ public class BlogController {
         } catch (Exception e) {
             e.printStackTrace();
             return R.error("网络繁忙，请稍后再试");
+        }
+    }
+
+    @GetMapping("/default/{blog}")
+    public R bolgDefaultInfo(@PathVariable("blog") Long id) {
+        BlogEntity blog;
+        try {
+            blog = blogService.getDefaultBlogInfo(id);
+            if (blog == null) {
+                return R.error("博客消失了");
+            }
+            return R.ok().put("data", blog);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error("网络繁忙，请稍后再试");
+        }
+    }
+
+    @PostMapping("/updateImg")
+    public R updateImg(@RequestBody BlogEntity blog) {
+        try {
+            blogService.updateImg(blog);
+            return R.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error();
+        }
+    }
+
+    @PostMapping("/updateType")
+    public R updateType(@RequestBody BlogEntity blog) {
+        try {
+            blogService.updateType(blog);
+            return R.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error();
+        }
+    }
+
+    @GetMapping("/{id}/createTag/{name}")
+    public R createTag(@PathVariable("id") Long id, @PathVariable("name") String name) {
+        try {
+            TagEntity tag = blogService.createTag(id, name);
+            return R.ok().put("data", tag);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error();
+        }
+    }
+
+    @PostMapping("/delTag")
+    public R delTag(@RequestBody DelBlogTagVo vo) {
+        try {
+            blogService.delTag(vo);
+            return R.ok();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error();
         }
     }
 

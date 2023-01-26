@@ -47,12 +47,5 @@ public interface CommentService extends IService<CommentEntity> {
      * @return
      */
     Long getCommentCount();
-
-    /**
-     * 获取文章评论
-     * @param id
-     * @return
-     */
-    List<CommentEntity> getBlogComments(Long id);
 }
 

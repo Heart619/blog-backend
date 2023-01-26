@@ -27,4 +27,5 @@ public interface UserDao extends BaseMapper<UserEntity> {
      * @return
      */
     List<UserEntity> selectUserAreaList();
+
 }

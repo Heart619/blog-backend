@@ -8,7 +8,7 @@
         <result property="id" column="id"/>
         <result property="title" column="title"/>
         <result property="content" column="content"/>
-        <result property="image" column="image"/>
+        <result property="author" column="author"/>
         <result property="praise" column="praise"/>
         <result property="color" column="color"/>
         <result property="createTime" column="create_time"/>

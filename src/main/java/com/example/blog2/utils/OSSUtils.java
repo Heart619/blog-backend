@@ -33,7 +33,7 @@ public class OSSUtils {
     @Autowired
     private OSSConfig ossConfig;
 
-    public String uploadText(String key, byte[] bytes) {
+    public String upload(String key, byte[] bytes) {
         //构造一个带指定 Region 对象的配置类
         Configuration cfg = new Configuration(Region.region0());
         cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
@@ -64,7 +64,7 @@ public class OSSUtils {
         return null;
     }
 
-    public void delText(String key) {
+    public void del(String key) {
         //构造一个带指定 Region 对象的配置类
         Configuration cfg = new Configuration(Region.region0());
         Auth auth = Auth.create(ossConfig.getAccessKey(), ossConfig.getSecretKey());
@@ -76,7 +76,7 @@ public class OSSUtils {
         }
     }
 
-    public byte[] loadText(String key) {
+    public byte[] load(String key) {
         try {
             String domainOfBucket = ossConfig.getRegion();
             String encodedFileName = URLEncoder.encode(key, "utf-8").replace("+", "%20");

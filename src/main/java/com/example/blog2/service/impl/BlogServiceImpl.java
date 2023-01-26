@@ -1,11 +1,14 @@
 package com.example.blog2.service.impl;
 
+import com.example.blog2.config.OSSConfig;
+import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.UserDao;
 import com.example.blog2.entity.*;
 import com.example.blog2.service.*;
 import com.example.blog2.utils.*;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -17,9 +20,20 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.example.blog2.dao.BlogDao;
+import com.example.blog2.vo.DelBlogTagVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -27,6 +41,12 @@ import org.springframework.util.StringUtils;
  */
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements BlogService {
+
+    @Autowired
+    private TransactionDefinition transactionDefinition;
+
+    @Autowired
+    private PlatformTransactionManager platformTransactionManager;
 
     @Autowired
     private UserDao userDao;
@@ -44,15 +64,24 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
     private UserService userService;
 
     @Autowired
+    private CommentService commentService;
+
+    @Autowired
     private ThreadPoolExecutor executor;
 
     @Autowired
     private OSSUtils ossUtils;
 
+    @Autowired
+    private OSSConfig ossConfig;
+
+    @Autowired
+    private PicturesService picturesService;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         QueryWrapper<BlogEntity> queryWrapper = new QueryWrapper<>();
-        String query = String.valueOf(params.get("query"));
+        String query = String.valueOf(params.get("title"));
         if (!StringUtils.isEmpty(query) && !"null".equals(query)) {
             queryWrapper.like("title", query);
         }
@@ -65,6 +94,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             }
         }
 
+        Object userId = params.get("userId");
+        if (userId != null) {
+            queryWrapper.eq("user_id", userId);
+        }
+        queryWrapper.orderByDesc("create_time", "views");
         IPage<BlogEntity> page = this.page(
                 new Query<BlogEntity>().getPage(params),
                 queryWrapper
@@ -206,6 +240,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             blog.setContent(text);
         }, executor);
 
+        CompletableFuture.runAsync(() -> {
+            // 更新阅读量
+            int oldv = blog.getViews();
+            while (baseMapper.updateViews(id, oldv, oldv + 1) == 0) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {}
+                oldv = getById(id).getViews();
+            }
+        }, executor);
+
         CompletableFuture.allOf(tag, type, content, author).get();
         return blog;
     }
@@ -214,6 +259,188 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
     public List<BlogEntity> search(String query) {
         return baseMapper.selectCondition(query);
     }
+
+    @Override
+    public void delBlog(Long id) {
+        CompletableFuture.runAsync(() -> {
+            // 删除博客内容
+            BlogEntity blog = getById(id);
+            String img = blog.getFirstPicture();
+            if (!StringUtils.isEmpty(img) && !ConstantImg.DEFAULT_IMG.equals(img)) {
+                ossUtils.del(blog.getFirstPicture());
+            }
+            ossUtils.del(blog.getContent());
+        }, executor);
+
+        // 删除博客图片
+        CompletableFuture.runAsync(() -> {
+            List<PicturesEntity> entityList = picturesService.list(new QueryWrapper<PicturesEntity>().eq("belong", id).eq("type", true));
+            entityList.forEach(x -> {
+                ossUtils.del(x.getImage());
+            });
+            picturesService.removeByIds(entityList);
+        }, executor);
+
+        // 删除博客标签对应关系
+        CompletableFuture.runAsync(() -> {
+            blogTagsService.remove(new QueryWrapper<BlogTagsEntity>().eq("blogs_id", id));
+        }, executor);
+
+        // 删除博客相关评论
+        CompletableFuture.runAsync(() -> {
+            commentService.remove(new QueryWrapper<CommentEntity>().eq("blog_id", id));
+        }, executor);
+
+        removeById(id);
+    }
+
+    @Override
+    public void updateImg(BlogEntity blog) {
+        BlogEntity entity = getById(blog.getId());
+        if (!StringUtils.isEmpty(entity.getFirstPicture()) && !ConstantImg.DEFAULT_IMG.equals(entity.getFirstPicture())) {
+            ossUtils.del(entity.getFirstPicture());
+        }
+
+        updateById(blog);
+    }
+
+    @Override
+    public BlogEntity getDefaultBlogInfo(Long id) {
+        BlogEntity blog = getById(id);
+        blog.setContent(new String(ossUtils.load(blog.getContent()), StandardCharsets.UTF_8));
+        return blog;
+    }
+
+    @Override
+    public void updateBlog(BlogEntity blog) {
+        BlogEntity old = getById(blog.getId());
+        String key = old.getContent();
+        if (!StringUtils.isEmpty(key)) {
+            ossUtils.del(key);
+        }
+
+        String[] split = key.split("/");
+        if (split.length > 2) {
+            key = ossConfig.getBlog() + split[1] + "/" + UUID.randomUUID();
+        }
+        blog.setContent(ossUtils.upload(key, blog.getContent().getBytes(StandardCharsets.UTF_8)));
+
+        CompletableFuture.runAsync(() -> {
+            updatePictureBelongBlog(blog.getId());
+        }, executor);
+
+        updateById(blog);
+    }
+
+    @Override
+    public boolean addBlog(BlogEntity blog) throws ExecutionException, InterruptedException {
+//        TransactionStatus[] status = new TransactionStatus[3];
+
+        CompletableFuture<Long> saveFuture = CompletableFuture.supplyAsync(() -> {
+//            status[0] = platformTransactionManager.getTransaction(transactionDefinition);
+            blog.setCreateTime(new Date());
+            blog.setUpdateTime(new Date());
+            blog.setDescription(blog.getContent().substring(0, Math.min(120, blog.getContent().length())));
+            if (StringUtils.isEmpty(blog.getFirstPicture())) {
+                blog.setFirstPicture(ConstantImg.DEFAULT_IMG);
+            }
+            String k = ossConfig.getBlog() + LocalDate.now() + "/" + UUID.randomUUID();
+            ossUtils.upload(k, blog.getContent().getBytes(StandardCharsets.UTF_8));
+            blog.setContent(k);
+            blog.setPublished(false);
+            blog.setRecommend(true);
+            blog.setShareStatement(false);
+            save(blog);
+            return blog.getId();
+        }, executor);
+
+        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+
+        CompletableFuture<Void> picturesFuture = saveFuture.thenAcceptAsync(x -> {
+//            status[1] = platformTransactionManager.getTransaction(transactionDefinition);
+            RequestContextHolder.setRequestAttributes(attributes);
+            updatePictureBelongBlog(x);
+        }, executor);
+
+        CompletableFuture<Void> blogTagFuture = saveFuture.thenAcceptAsync(a -> {
+//            status[2] = platformTransactionManager.getTransaction(transactionDefinition);
+
+            String tagIds = blog.getTagIds();
+            String[] split = tagIds.split(",");
+            List<BlogTagsEntity> blogTagsEntities = Arrays.stream(split).map(x -> {
+                BlogTagsEntity blogTags = new BlogTagsEntity();
+                blogTags.setTagsId(Long.parseLong(x));
+                blogTags.setBlogsId(a);
+                return blogTags;
+            }).collect(Collectors.toList());
+            blogTagsService.saveBatch(blogTagsEntities);
+        }, executor);
+
+//        try {
+            CompletableFuture.allOf(picturesFuture, blogTagFuture).get();
+//            for (TransactionStatus s : status) {
+//                if (s.isCompleted()) {
+//                    platformTransactionManager.commit(s);
+//                }
+//            }
+            return true;
+//        } catch (Exception e) {
+//            for (TransactionStatus s : status) {
+//                if (s.isCompleted()) {
+//                    platformTransactionManager.rollback(s);
+//                }
+//            }
+//            return false;
+//        }
+    }
+
+    @Override
+    public void updateType(BlogEntity blog) {
+        updateById(blog);
+    }
+
+    @Override
+    public void delTag(DelBlogTagVo vo) {
+        blogTagsService.remove(new QueryWrapper<BlogTagsEntity>().eq("blogs_id", vo.getId()).eq("tags_id", vo.getTagId()));
+    }
+
+    @Override
+    public TagEntity createTag(Long id, String name) {
+        TagEntity tag = new TagEntity();
+        tag.setName(name);
+        tagService.save(tag);
+
+        BlogTagsEntity blogTags = new BlogTagsEntity();
+        blogTags.setBlogsId(id);
+        blogTags.setTagsId(tag.getId());
+        blogTagsService.save(blogTags);
+        return tag;
+    }
+
+    /**
+     * 更新图片所属博客
+     * @param blogId
+     */
+    private void updatePictureBelongBlog(Long blogId) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null && cookies.length > 0) {
+            Cookie c = null;
+            for (Cookie cookie : cookies) {
+                if (ConstantImg.IMG_COOKIE_NAME.equals(cookie.getName())) {
+                    c = cookie;
+                    break;
+                }
+            }
+            if (c != null) {
+                long id = Long.parseLong(c.getValue());
+                picturesService.updateOldPicturesByLongId(id, blogId, 1);
+            }
+        }
+    }
+
 
     private UserEntity getBlogAuthor(Long userId) {
         return userService.getById(userId);
@@ -230,7 +457,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
     }
 
     private String getText(String content) {
-        byte[] bytes = ossUtils.loadText(content);
+        byte[] bytes = ossUtils.load(content);
         return MarkdownUtils.markdownToHtmlExtensions(new String(bytes, StandardCharsets.UTF_8));
     }
 

@@ -22,5 +22,11 @@ public interface EssayService extends IService<EssayEntity> {
      * @param essay
      */
     void saveEssay(EssayEntity essay);
+
+    /**
+     * 删除随笔
+     * @param id
+     */
+    void delEssayById(Long id);
 }
 

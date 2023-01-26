@@ -49,7 +49,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
 
     @Override
     public List<CommentEntity> getCommentsByBlogId(Long blogId) {
-        return list(new QueryWrapper<CommentEntity>().eq("blog_id", blogId));
+        return list(new QueryWrapper<CommentEntity>().eq("blog_id", blogId).orderByDesc("create_time"));
     }
 
     @Override
@@ -71,11 +71,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
     @Override
     public Long getCommentCount() {
         return baseMapper.selectCommentCount();
-    }
-
-    @Override
-    public List<CommentEntity> getBlogComments(Long id) {
-        return list(new QueryWrapper<CommentEntity>().eq("blog_id", id));
     }
 
     private void delChildrenComment(Long faId) {

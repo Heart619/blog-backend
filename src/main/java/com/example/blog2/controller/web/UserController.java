@@ -1,5 +1,6 @@
 package com.example.blog2.controller.web;
 
+import com.example.blog2.entity.UserEntity;
 import com.example.blog2.po.Result;
 import com.example.blog2.po.StatusCode;
 import com.example.blog2.po.User;
@@ -29,8 +30,8 @@ public class UserController {
         User u = para.get("user");
         User user = userService.checkUser(u.getUsername(), u.getPassword());
         if (user != null) {
-            String token = TokenUtil.sign(user);
-            Map<String, Object> info = new HashMap<>();
+            String token = TokenUtil.sign(new UserEntity());
+            Map<String, Object> info = new HashMap<>(2);
             user.setLoginProvince(u.getLoginProvince());
             user.setLoginCity(u.getLoginCity());
             user.setLoginLat(u.getLoginLat());
@@ -51,7 +52,7 @@ public class UserController {
         User u = para.get("user");
         if (u != null) {
             User user = userService.save(u);
-            String token = TokenUtil.sign(user);
+            String token = TokenUtil.sign(new UserEntity());
             Map<String, Object> info = new HashMap<>();
             info.put("user", user);
             info.put("token", token);
