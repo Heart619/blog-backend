@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.blog2.dao.BlogDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.example.blog2.entity.BlogEntity" id="blogMap">
+        <result property="id" column="id"/>
+        <result property="appreciation" column="appreciation"/>
+        <result property="commentabled" column="commentabled"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="create_time"/>
+        <result property="description" column="description"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="flag" column="flag"/>
+        <result property="published" column="published"/>
+        <result property="recommend" column="recommend"/>
+        <result property="shareStatement" column="share_statement"/>
+        <result property="title" column="title"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="views" column="views"/>
+        <result property="typeId" column="type_id"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <select id="selectAllBlogTypeId" resultType="java.lang.Long">
+        select type_id from t_blog
+    </select>
+
+    <select id="selectAllBlogIdAndTitles" resultType="com.example.blog2.entity.BlogEntity">
+        select id, title
+        from t_blog
+    </select>
+
+    <select id="selectRecommedBlog" resultType="com.example.blog2.entity.BlogEntity">
+        select b.id, b.title, b.flag, t.name typeName
+        from t_blog b
+        inner join t_type t
+        on b.type_id = t.id
+        order by b.update_time desc
+        limit 7
+    </select>
+
+    <select id="selectNewBlog" resultType="com.example.blog2.entity.BlogEntity">
+        select id, title
+        from t_blog
+        order by create_time desc
+        limit 3
+    </select>
+    <select id="selectViewCountByMonth" resultType="java.lang.String">
+        select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), sum(views)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+    </select>
+    <select id="selectBlogCountByMonth" resultType="java.lang.String">
+        select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), count(*)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+    </select>
+    <select id="selectAppreciateCountByMonth" resultType="java.lang.String">
+        select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), sum(appreciation)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+    </select>
+    <select id="selectBlogCount" resultType="java.lang.Long">
+        select count(*) from t_blog
+    </select>
+    <select id="selectViewCount" resultType="java.lang.Long">
+        select sum(views) from t_blog;
+    </select>
+    <select id="selectAppreciateCount" resultType="java.lang.Long">
+        select sum(appreciation) from t_blog;
+    </select>
+    <select id="selectCondition" resultType="com.example.blog2.entity.BlogEntity">
+        select id, title
+        from t_blog
+        where title like concat('%', #{query}, '%')
+        order by appreciation desc, views desc, update_time desc
+        limit 6
+    </select>
+
+</mapper>

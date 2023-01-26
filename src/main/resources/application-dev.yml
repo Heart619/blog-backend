@@ -1,0 +1,42 @@
+logging:
+  file:
+    name: log.blog-dev.log
+  level:
+    com:
+      example:
+        blog2: info
+    root: info
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+  mapper-locations: classpath:/mapper/**/*.xml
+
+server:
+  compression:
+    enabled: true
+    mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
+  port: 8090
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    password: 123456
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+oss:
+  accessKey: Djaw32O83II324ZtpxvlCmUH1FTi7hOuOVr6vRuN
+  blog: text/blog/
+  bucket: mxp-blog
+  essay: text/essay/
+  region: http://roxuynt15.hd-bkt.clouddn.com
+  secretKey: 6nX92UklXiZf7KOYBtTVOss3xG4RGvP4O1mYmi3s
+
+my:
+  thread:
+    core: 8
+    max: 8
