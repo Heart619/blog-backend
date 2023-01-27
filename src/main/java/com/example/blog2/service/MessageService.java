@@ -16,5 +16,11 @@ import java.util.Map;
 public interface MessageService extends IService<MessageEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 删除用户时，清楚用户留言
+     * @param id
+     */
+    void userDelUpdateMessage(Long id);
 }
 

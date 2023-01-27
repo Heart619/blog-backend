@@ -1,6 +1,9 @@
 package com.example.blog2.service.impl;
 
 import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.entity.MessageEntity;
+import com.example.blog2.service.CommentService;
+import com.example.blog2.service.MessageService;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
@@ -13,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -31,6 +37,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Autowired
     private OSSUtils ossUtils;
+
+    @Autowired
+    private ThreadPoolExecutor executor;
+
+    @Autowired
+    private MessageService messageService;
+
+    @Autowired
+    private CommentService commentService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -118,6 +133,28 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         loginVo.setUser(user);
         loginVo.setToken(TokenUtil.sign(user));
         return loginVo;
+    }
+
+    @Override
+    public void removeUser(Long id) {
+        UserEntity user = getById(id);
+        removeById(user);
+
+        CompletableFuture.runAsync(() -> {
+            if (!ConstantImg.DEFAULT_AVATAR.equals(user.getAvatar())) {
+                ossUtils.del(user.getAvatar());
+            }
+        }, executor);
+
+        CompletableFuture.runAsync(() -> {
+            messageService.userDelUpdateMessage(id);
+        }, executor);
+
+        CompletableFuture.runAsync(() -> {
+            commentService.userDelUpdateComment(id);
+        }, executor);
+
+
     }
 
 }

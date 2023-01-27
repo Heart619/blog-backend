@@ -46,8 +46,8 @@ public class TypeController {
     @RequestMapping("/save")
     public R save(@RequestBody TypeEntity type){
         try {
-            typeService.addType(type);
-            return R.ok();
+            TypeEntity t = typeService.addType(type);
+            return R.ok().put("data", t);
         } catch (Exception e) {
             return R.error(e.getMessage());
         }

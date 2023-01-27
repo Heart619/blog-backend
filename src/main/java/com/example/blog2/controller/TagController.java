@@ -38,7 +38,7 @@ public class TagController {
     public R save(@RequestBody TagEntity tag){
         try {
             TagEntity tagEntity = tagService.addTag(tag);
-            return R.ok("新增成功");
+            return R.ok("新增成功").put("data", tagEntity);
         } catch (Exception e) {
             return R.error(e.getMessage());
         }

@@ -12,6 +12,11 @@
         <result property="userId" column="user_id"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+    <update id="updateUserMessage">
+        update t_message set
+        nickname = '匿名用户', avatar = #{defaultAvatar}, user_id = -1
+        where user_id = #{id}
+    </update>
 
 
 </mapper>

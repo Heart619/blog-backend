@@ -6,6 +6,7 @@ import com.example.blog2.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class EssayWebController {
     private EssayService essayService;
 
     @RequestMapping("/list")
-    public R list(@RequestBody(required = false) Map<String, Object> params){
+    public R list(@RequestParam(required = false) Map<String, Object> params){
         if (params == null) {
             params = new HashMap<>(0);
         }

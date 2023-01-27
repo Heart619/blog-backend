@@ -76,6 +76,9 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
             if (user != null) {
                 x.setNickName(user.getNickname());
                 x.setAvatar(user.getAvatar());
+            } else {
+                x.setNickName("用户已注销");
+                x.setAvatar(ConstantImg.DEFAULT_AVATAR);
             }
         });
         return new PageUtils(page);

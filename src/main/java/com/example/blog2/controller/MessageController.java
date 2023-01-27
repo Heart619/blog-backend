@@ -27,17 +27,6 @@ public class MessageController {
     private MessageService messageService;
 
     /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = messageService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
-
-
-    /**
      * 信息
      */
     @RequestMapping("/info/{id}")

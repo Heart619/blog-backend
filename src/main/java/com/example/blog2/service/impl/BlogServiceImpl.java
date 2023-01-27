@@ -125,8 +125,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             records.forEach(x -> {
                 UserEntity user = map.get(x.getUserId());
                 TypeEntity type = typeEntityMap.get(x.getTypeId());
-                x.setUserAvatar(user == null ? ConstantImg.DEFAULT_AVATAR : user.getAvatar());
-                x.setUserNickName(user == null ? "数据异常" : user.getNickname());
+                if (user != null) {
+                    x.setUserAvatar(user.getAvatar());
+                    x.setUserNickName(user.getNickname());
+                } else {
+                    x.setUserAvatar(ConstantImg.DEFAULT_AVATAR);
+                    x.setUserNickName("用户已注销");
+                }
                 x.setTypeName(type == null ? "" : type.getName());
             });
         }, executor);
@@ -230,8 +235,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
         CompletableFuture<Void> author = CompletableFuture.runAsync(() -> {
             // 获取作者信息
             UserEntity user = getBlogAuthor(blog.getUserId());
-            blog.setUserAvatar(user.getAvatar());
-            blog.setUserNickName(user.getNickname());
+            if (user != null) {
+                blog.setUserAvatar(user.getAvatar());
+                blog.setUserNickName(user.getNickname());
+            } else {
+                blog.setUserNickName("用户已注销");
+                blog.setUserAvatar(ConstantImg.DEFAULT_AVATAR);
+            }
         }, executor);
 
         CompletableFuture<Void> content = CompletableFuture.runAsync(() -> {

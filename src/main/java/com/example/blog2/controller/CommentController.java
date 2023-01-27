@@ -48,17 +48,6 @@ public class CommentController {
     }
 
     /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    public R save(@RequestBody CommentEntity comment){
-        comment.setCreateTime(new Date());
-		commentService.save(comment);
-
-        return R.ok();
-    }
-
-    /**
      * 修改
      */
     @RequestMapping("/update")

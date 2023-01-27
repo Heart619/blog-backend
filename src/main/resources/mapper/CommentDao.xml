@@ -16,6 +16,11 @@
         <result property="content" column="content"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
+    <update id="userDelUpdateComment">
+        update t_comment set
+        avatar = #{defaultAvatar}, email = '', nickname = '用户已注销'
+        where user_id = #{id}
+    </update>
     <select id="selectChilderComment" parameterType="long" resultType="java.lang.Long">
         select id
         from t_comment

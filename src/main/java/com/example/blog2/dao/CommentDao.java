@@ -1,6 +1,5 @@
 package com.example.blog2.dao;
 
-import com.example.blog2.entity.BlogEntity;
 import com.example.blog2.entity.CommentEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -42,4 +41,11 @@ public interface CommentDao extends BaseMapper<CommentEntity> {
      * @return
      */
     Long selectCommentCount();
+
+    /**
+     * 用户删除时更新评论信息
+     * @param id
+     * @param defaultAvatar
+     */
+    void userDelUpdateComment(@Param("id") Long id, @Param("defaultAvatar") String defaultAvatar);
 }

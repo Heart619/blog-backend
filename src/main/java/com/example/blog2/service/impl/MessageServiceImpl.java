@@ -1,5 +1,7 @@
 package com.example.blog2.service.impl;
 
+import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.utils.Constant;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
 import org.springframework.stereotype.Service;
@@ -23,10 +25,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, MessageEntity> i
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<MessageEntity> page = this.page(
                 new Query<MessageEntity>().getPage(params),
-                new QueryWrapper<MessageEntity>()
+                new QueryWrapper<MessageEntity>().orderByDesc("create_time")
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void userDelUpdateMessage(Long id) {
+        this.baseMapper.updateUserMessage(id, ConstantImg.DEFAULT_AVATAR);
     }
 
 }

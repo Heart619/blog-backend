@@ -3,6 +3,7 @@ package com.example.blog2.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.blog2.entity.CommentEntity;
 import com.example.blog2.utils.PageUtils;
+import com.example.blog2.vo.BlogCommentVo;
 
 import java.util.List;
 import java.util.Map;
@@ -47,5 +48,33 @@ public interface CommentService extends IService<CommentEntity> {
      * @return
      */
     Long getCommentCount();
+
+    /**
+     * 用户删除时更新评论信息
+     * @param id
+     */
+    void userDelUpdateComment(Long id);
+
+    /**
+     * 分页查询博客评论
+     * @param params
+     * @return
+     */
+    PageUtils queryBlogCommentPage(Map<String, Object> params);
+
+    /**
+     * 显示该父评论的子评论
+     * @param id
+     * @param cid
+     * @return
+     */
+    List<BlogCommentVo> getCmtByPmt(Long id, Long cid);
+
+    /**
+     * 评论
+     * @param comment
+     * @return
+     */
+    BlogCommentVo addComment(CommentEntity comment);
 }
 

@@ -83,7 +83,7 @@ public class UserController {
     @GetMapping("/del/{id}")
     public R delUser(@PathVariable("id") Long id) {
         try {
-            userService.removeById(id);
+            userService.removeUser(id);
             return R.ok();
         } catch (Exception e) {
             log.error(e.getMessage());

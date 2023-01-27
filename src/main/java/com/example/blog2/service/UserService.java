@@ -55,5 +55,11 @@ public interface UserService extends IService<UserEntity> {
      * @param vo
      */
     UserLoginVo updatePwd(PasswordUpdateVo vo);
+
+    /**
+     * 删除用户
+     * @param id
+     */
+    void removeUser(Long id);
 }
 

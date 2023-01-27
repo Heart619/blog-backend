@@ -1,14 +1,16 @@
 package com.example.blog2.service.impl;
 
+import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.BlogDao;
 import com.example.blog2.entity.BlogEntity;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
+import com.example.blog2.vo.BlogCommentVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -34,7 +36,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CommentEntity> page = this.page(
                 new Query<CommentEntity>().getPage(params),
-                new QueryWrapper<CommentEntity>()
+                new QueryWrapper<CommentEntity>().orderByDesc("create_time")
         );
 
         List<CommentEntity> records = page.getRecords();
@@ -71,6 +73,56 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
     @Override
     public Long getCommentCount() {
         return baseMapper.selectCommentCount();
+    }
+
+    @Override
+    public void userDelUpdateComment(Long id) {
+        this.baseMapper.userDelUpdateComment(id, ConstantImg.DEFAULT_AVATAR);
+    }
+
+    @Override
+    public PageUtils queryBlogCommentPage(Map<String, Object> params) {
+        long blog = Long.parseLong(String.valueOf(params.get("blog")));
+        IPage<CommentEntity> page = this.page(
+                new Query<CommentEntity>().getPage(params),
+                new QueryWrapper<CommentEntity>().eq("blog_id", blog).eq("parent_comment_id", -1).orderByDesc("create_time")
+        );
+
+        PageUtils pageUtils = new PageUtils(page);
+        List<BlogCommentVo> blogCommentVos = pageUtils.getList().stream().map(x -> {
+            BlogCommentVo vo = new BlogCommentVo();
+            BeanUtils.copyProperties(x, vo);
+            vo.setChildren(Collections.emptyList());
+            vo.setParentComment(null);
+            vo.setShowChildren(false);
+            return vo;
+        }).collect(Collectors.toList());
+
+        pageUtils.setList(blogCommentVos);
+        return pageUtils;
+    }
+
+    @Override
+    public List<BlogCommentVo> getCmtByPmt(Long blog, Long cid) {
+       return list(new QueryWrapper<CommentEntity>().eq("blog_id", blog).ne("parent_comment_id", -1).orderByDesc("create_time")).stream().map(x -> {
+            BlogCommentVo vo = new BlogCommentVo();
+            BeanUtils.copyProperties(x, vo);
+            vo.setChildren(Collections.emptyList());
+            vo.setParentComment(null);
+            vo.setShowChildren(false);
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public BlogCommentVo addComment(CommentEntity comment) {
+        BlogCommentVo commentVo = new BlogCommentVo();
+        save(comment);
+        BeanUtils.copyProperties(comment, commentVo);
+        commentVo.setShowChildren(false);
+        commentVo.setParentComment(null);
+        commentVo.setChildren(Collections.emptyList());
+        return commentVo;
     }
 
     private void delChildrenComment(Long faId) {
