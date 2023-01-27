@@ -46,5 +46,6 @@ public interface PicturesService extends IService<PicturesEntity> {
      * @param pictures
      */
     void delPic(PicturesEntity pictures);
+
 }
 

@@ -1,20 +1,35 @@
 package com.example.blog2.service;
 
-import com.example.blog2.po.Project;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.blog2.entity.ProjectEntity;
+import com.example.blog2.utils.PageUtils;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * @author hikari
- * @version 1.0
- * @date 2021/7/12 21:07
+ * @author mxp
+ * @date 2023-01-25 09:47:20
  */
-public interface ProjectService {
-    List<Project> listProject();
+public interface ProjectService extends IService<ProjectEntity> {
 
-    void deleteProject(Long id);
+    PageUtils queryPage(Map<String, Object> params);
 
-    Project saveProject(Project project);
+    /**
+     * 删除项目
+     * @param id
+     */
+    void removeProject(Long id);
 
-    Project updateProject(Long id,Project project);
+    /**
+     * 更新项目
+     * @param project
+     */
+    void updateProject(ProjectEntity project);
+
+    /**
+     * 新增项目
+     * @param project
+     */
+    void addProject(ProjectEntity project);
 }
+

@@ -125,7 +125,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             records.forEach(x -> {
                 UserEntity user = map.get(x.getUserId());
                 TypeEntity type = typeEntityMap.get(x.getTypeId());
-                x.setUserAvatar(user == null ? "default/avatar.png" : user.getAvatar());
+                x.setUserAvatar(user == null ? ConstantImg.DEFAULT_AVATAR : user.getAvatar());
                 x.setUserNickName(user == null ? "数据异常" : user.getNickname());
                 x.setTypeName(type == null ? "" : type.getName());
             });

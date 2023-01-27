@@ -1,5 +1,6 @@
 package com.example.blog2.service.impl;
 
+import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.po.User;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.utils.PageUtils;
@@ -81,7 +82,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         user.setCreateTime(new Date());
         user.setUpdateTime(new Date());
         if (user.getAvatar() == null || "".equals(user.getAvatar())) {
-            user.setAvatar("default/avatar.png");
+            user.setAvatar(ConstantImg.DEFAULT_AVATAR);
         }
         save(user);
 
@@ -95,7 +96,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     public UserEntity setAvatar(UserEntity user) {
         UserEntity userEntity = getById(user.getId());
         String avatar = userEntity.getAvatar();
-        if (!"default/avatar.png".equals(avatar)) {
+        if (!ConstantImg.DEFAULT_AVATAR.equals(avatar)) {
             ossUtils.del(avatar);
         }
         updateById(user);

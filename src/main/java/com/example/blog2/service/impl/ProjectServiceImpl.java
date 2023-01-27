@@ -1,54 +1,69 @@
 package com.example.blog2.service.impl;
 
-import com.example.blog2.dao.ProjectRepository;
-import com.example.blog2.po.Project;
-import com.example.blog2.service.old.PicturesService;
-import com.example.blog2.service.ProjectService;
-import com.example.blog2.utils.MyBeanUtils;
-import org.springframework.beans.BeanUtils;
+import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.utils.Constant;
+import com.example.blog2.utils.OSSUtils;
+import com.example.blog2.utils.PageUtils;
+import com.example.blog2.utils.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.Map;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import com.example.blog2.dao.ProjectDao;
+import com.example.blog2.entity.ProjectEntity;
+import com.example.blog2.service.ProjectService;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 
 /**
- * @author hikari
- * @version 1.0
- * @date 2021/7/12 21:08
+ * @author mxp
  */
 @Service
-public class ProjectServiceImpl implements ProjectService {
+public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> implements ProjectService {
 
     @Autowired
-    private ProjectRepository projectRepository;
-
-//    @Autowired
-    private PicturesService picturesService;
+    private OSSUtils ossUtils;
 
     @Override
-    public List<Project> listProject() {
-        return projectRepository.findAll();
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<ProjectEntity> page = this.page(
+                new Query<ProjectEntity>().getPage(params),
+                new QueryWrapper<ProjectEntity>()
+        );
+
+        return new PageUtils(page);
     }
 
     @Override
-    public void deleteProject(Long id) {
-        Project project = projectRepository.getOne(id);
-        if (!StringUtils.isEmpty(project.getPic_url())) {
-            picturesService.delOssImg(project.getPic_url());
+    public void removeProject(Long id) {
+        ProjectEntity project = getById(id);
+        if (!ConstantImg.DEFAULT_IMG.equals(project.getPicUrl())) {
+            ossUtils.del(project.getPicUrl());
         }
-        projectRepository.deleteById(id);
+        removeById(id);
     }
 
     @Override
-    public Project saveProject(Project project) {
-        return projectRepository.save(project);
+    public void updateProject(ProjectEntity project) {
+        if (!StringUtils.isEmpty(project.getPicUrl())) {
+            ProjectEntity old = getById(project.getId());
+            ossUtils.del(old.getPicUrl());
+        }
+
+        updateById(project);
+
     }
 
     @Override
-    public Project updateProject(Long id, Project project) {
-        Project p = projectRepository.getOne(id);
-        BeanUtils.copyProperties(project,p, MyBeanUtils.getNullPropertyNames(project));
-        return projectRepository.save(p);
+    public void addProject(ProjectEntity project) {
+        if (StringUtils.isEmpty(project.getPicUrl())) {
+            project.setPicUrl(ConstantImg.DEFAULT_IMG);
+        }
+
+        save(project);
     }
+
 }

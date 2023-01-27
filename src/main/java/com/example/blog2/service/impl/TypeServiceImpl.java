@@ -1,8 +1,10 @@
 package com.example.blog2.service.impl;
 
+import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.BlogDao;
 import com.example.blog2.entity.TagEntity;
 import com.example.blog2.service.TypeService;
+import com.example.blog2.utils.Constant;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.example.blog2.dao.TypeDao;
 import com.example.blog2.entity.TypeEntity;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -49,6 +52,10 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
     public TypeEntity addType(TypeEntity typeEntity) {
         if (existsName(typeEntity.getName())) {
             throw new RuntimeException("分类名称重复");
+        }
+
+        if (StringUtils.isEmpty(typeEntity.getPicUrl())) {
+            typeEntity.setPicUrl(ConstantImg.DEFAULT_IMG);
         }
         save(typeEntity);
         return typeEntity;

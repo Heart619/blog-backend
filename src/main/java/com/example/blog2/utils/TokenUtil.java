@@ -19,7 +19,7 @@ public class TokenUtil {
     private static final long EXPIRE_TIME= 10 * 60 * 60 * 1000;
 
     //密钥盐
-    private static final String TOKEN_SECRET = "QIUQIULQXIANGQUDACHANG";
+    private static final String TOKEN_SECRET = "QIUQIULEXIANGQUDACHANG";
 
     /**
      * 签名生成
@@ -70,7 +70,7 @@ public class TokenUtil {
         try {
             JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).withIssuer("auth0").build();
             DecodedJWT jwt = verifier.verify(token);
-            if ( "1".equals(jwt.getClaim("userType").asString())){
+            if (Integer.parseInt(jwt.getClaim("userType").asString()) > 0){
                 return true;
             }
             return false;

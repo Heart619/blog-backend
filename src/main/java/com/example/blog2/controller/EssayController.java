@@ -1,6 +1,7 @@
 package com.example.blog2.controller;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.example.blog2.utils.PageUtils;
@@ -28,7 +29,10 @@ public class EssayController {
      * 列表
      */
     @RequestMapping("/list")
-    public R list(@RequestBody Map<String, Object> params){
+    public R list(@RequestBody(required = false) Map<String, Object> params){
+        if (params == null) {
+            params = new HashMap<>(0);
+        }
         PageUtils page = essayService.queryPage(params);
 
         return R.ok().put("page", page);

@@ -54,6 +54,7 @@ public class PicturesController {
     @PostMapping("/saveImg")
     public R save(@RequestBody PicturesEntity pictures){
         try {
+            pictures.setBelong(-1L);
             picturesService.save(pictures);
             return R.ok().put("data", pictures.getId());
         } catch (Exception e) {

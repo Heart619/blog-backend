@@ -41,5 +41,5 @@ oss:
 
 my:
   thread:
-    core: 8
-    max: 8
+    core: 12
+    max: 12
