@@ -19,25 +19,11 @@ import com.example.blog2.service.EssayService;
  * @date 2023-01-25 09:47:20
  */
 @RestController
-@RequestMapping("essay")
+@RequestMapping("/admin/essay")
 public class EssayController {
 
     @Autowired
     private EssayService essayService;
-
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestBody(required = false) Map<String, Object> params){
-        if (params == null) {
-            params = new HashMap<>(0);
-        }
-        PageUtils page = essayService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
-
 
     /**
      * 信息

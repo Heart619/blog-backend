@@ -18,11 +18,10 @@ import com.example.blog2.service.TypeService;
 
 /**
  * @author mxp
- * @email mxp@gmail.com
  * @date 2023-01-25 09:47:20
  */
 @RestController
-@RequestMapping("/type")
+@RequestMapping("/admin/type")
 public class TypeController {
 
     @Autowired
@@ -30,17 +29,6 @@ public class TypeController {
 
     @Autowired
     private OSSUtils ossUtils;
-
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = typeService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
-
 
     /**
      * 信息
@@ -101,12 +89,6 @@ public class TypeController {
         } catch (Exception e) {
             return R.error();
         }
-    }
-
-    @GetMapping("/getAllType")
-    public R getAllType() {
-        List<TypeEntity> typeEntities = typeService.getAllType();
-        return R.ok("获取全部博客分类成功").put("data", typeEntities);
     }
 
 }

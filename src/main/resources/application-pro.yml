@@ -12,11 +12,7 @@ server:
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     password: 123456
     url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8
     username: root
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true

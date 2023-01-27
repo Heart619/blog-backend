@@ -24,25 +24,11 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2023-01-25 09:47:20
  */
 @RestController
-@RequestMapping("blog")
+@RequestMapping("/admin/blog")
 public class BlogController {
 
     @Autowired
     private BlogService blogService;
-
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestBody(required = false) Map<String, Object> params){
-        if (params == null) {
-            params = new HashMap<>();
-        }
-        PageUtils page = blogService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
-
 
     /**
      * 信息
@@ -101,21 +87,6 @@ public class BlogController {
         } catch (Exception e) {
             e.printStackTrace();
             return R.error();
-        }
-    }
-
-    @GetMapping("/{blog}")
-    public R bolgInfo(@PathVariable("blog") Long id) {
-        BlogEntity blog;
-        try {
-            blog = blogService.getBlogInfo(id);
-            if (blog == null) {
-                return R.error("博客消失了");
-            }
-            return R.ok().put("data", blog);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error("网络繁忙，请稍后再试");
         }
     }
 
@@ -182,19 +153,6 @@ public class BlogController {
     public R search(String query) {
         List<BlogEntity> blogs = blogService.search(query);
         return R.ok().put("data", blogs);
-    }
-
-
-    @GetMapping("/getRecommendBlogList")
-    public R getRecommedBlog() {
-        List<BlogEntity> list = blogService.getRecommedBlog();
-        return R.ok().put("data", list);
-    }
-
-    @GetMapping("/newblog")
-    public R newblog() {
-        List<BlogEntity> list = blogService.getNewBlog();
-        return R.ok().put("data", list);
     }
 
     @GetMapping("/getViewCountByMonth")

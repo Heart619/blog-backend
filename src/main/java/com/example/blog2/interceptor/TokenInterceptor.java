@@ -2,6 +2,7 @@ package com.example.blog2.interceptor;
 
 import com.example.blog2.utils.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -38,16 +39,15 @@ public class TokenInterceptor implements HandlerInterceptor {
         response.setContentType("application/json; charset=utf-8");
         try{
             JSONObject json = new JSONObject();
-            json.put("msg","token verify fail");
-            json.put("code","500");
+            json.put("msg", "token verify fail");
+            json.put("code", HttpStatus.UNAUTHORIZED.value());
             response.getWriter().append(json.toJSONString());
+            response.sendRedirect("/error");
             log.warn("认证失败，未通过拦截器");
             return false;
         } catch (Exception e){
-            response.sendError(500);
-            return false;
-        } finally {
             response.sendRedirect("/error");
+            return false;
         }
     }
 }

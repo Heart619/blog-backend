@@ -5,14 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.example.blog2.po.Comment;
-import com.example.blog2.po.Result;
-import com.example.blog2.po.StatusCode;
-import com.example.blog2.po.User;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.blog2.entity.CommentEntity;
@@ -25,8 +20,9 @@ import com.example.blog2.service.CommentService;
  * @date 2023-01-25 09:47:20
  */
 @RestController
-@RequestMapping("comment")
+@RequestMapping("/admin/comment")
 public class CommentController {
+
     @Autowired
     private CommentService commentService;
 
@@ -82,32 +78,11 @@ public class CommentController {
         return R.ok();
     }
 
-    @GetMapping("/comments/{blogId}")
-    public R comments(@PathVariable Long blogId) {
-        List<CommentEntity> commentEntities;
-        try {
-            commentEntities = commentService.getCommentsByBlogId(blogId);
-            return R.ok("获取博客评论成功").put("data", commentEntities);
-        } catch (Exception e) {
-            return R.error("网络繁忙，请稍后再试");
-        }
-    }
-
     @GetMapping("/{id}/delete")
     public R delete(@PathVariable Long id) {
         try {
             commentService.delComment(id);
             return R.ok("删除成功");
-        } catch (Exception e) {
-            return R.error("网络繁忙，请稍后再试");
-        }
-    }
-
-    @GetMapping("/new/comments")
-    public R getNewComments() {
-        try {
-            List<CommentEntity> commentEntities = commentService.getNewComments();
-            return R.ok().put("data", commentEntities);
         } catch (Exception e) {
             return R.error("网络繁忙，请稍后再试");
         }

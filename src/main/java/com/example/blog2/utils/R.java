@@ -1,6 +1,5 @@
 package com.example.blog2.utils;
 
-import com.example.blog2.po.StatusCode;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
@@ -8,8 +7,6 @@ import java.util.Map;
 
 /**
  * 返回数据
- *
- * @author Mark sunlightcs@gmail.com
  */
 
 public class R<T> extends HashMap<String, Object> {
@@ -35,25 +32,6 @@ public class R<T> extends HashMap<String, Object> {
 	public R() {
 		put("code", 0);
 		put("msg", "success");
-	}
-
-	public R(HttpStatusEnum statusEnum) {
-		this.code = statusEnum.getCode();
-		this.message = statusEnum.getMsg();
-	}
-
-	public R(Boolean flag, Integer code, String message, T data) {
-		this.flag = flag;
-		this.code = code;
-		this.message = message;
-		this.data = data;
-	}
-
-	public R(Boolean flag, Integer code, String message) {
-		this.flag = flag;
-		this.code = code;
-		this.message = message;
-		this.data =  null;
 	}
 
 	public static R error() {

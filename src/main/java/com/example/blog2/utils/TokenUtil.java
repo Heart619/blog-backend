@@ -13,7 +13,9 @@ import java.util.Date;
  */
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class TokenUtil {
 
     private static final long EXPIRE_TIME= 10 * 60 * 60 * 1000;
@@ -70,11 +72,12 @@ public class TokenUtil {
         try {
             JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).withIssuer("auth0").build();
             DecodedJWT jwt = verifier.verify(token);
-            if (Integer.parseInt(jwt.getClaim("userType").asString()) > 0){
+            if (jwt.getClaim("userType").asInt() > 0){
                 return true;
             }
             return false;
         } catch (Exception e){
+            e.printStackTrace();
             return false;
         }
     }

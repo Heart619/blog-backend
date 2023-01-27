@@ -22,25 +22,11 @@ import com.example.blog2.service.ProjectService;
  * @date 2023-01-25 09:47:20
  */
 @RestController
-@RequestMapping("project")
+@RequestMapping("/admin/project")
 public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
-
-    /**
-     * 列表
-     */
-    @GetMapping("/list")
-    public R list(@RequestParam(required = false) Map<String, Object> params){
-        if (params == null) {
-            params = new HashMap<>(1);
-        }
-        PageUtils page = projectService.queryPage(params);
-
-        return R.ok().put("page", page);
-    }
-
 
     /**
      * 信息

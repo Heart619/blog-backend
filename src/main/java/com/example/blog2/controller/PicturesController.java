@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @date 2023-01-25 09:47:20
  */
 @RestController
-@RequestMapping("pictures")
+@RequestMapping("/admin/pictures")
 public class PicturesController {
 
     @Autowired

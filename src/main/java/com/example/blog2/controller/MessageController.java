@@ -1,13 +1,9 @@
 package com.example.blog2.controller;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.blog2.po.Message;
-import com.example.blog2.po.Result;
-import com.example.blog2.po.StatusCode;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +20,7 @@ import com.example.blog2.service.MessageService;
  * @date 2023-01-25 09:47:20
  */
 @RestController
-@RequestMapping("/message")
+@RequestMapping("/admin/message")
 public class MessageController {
 
     @Autowired
@@ -52,17 +48,6 @@ public class MessageController {
     }
 
     /**
-     * 保存
-     */
-    @RequestMapping("/addMessage")
-    public R save(@RequestBody MessageEntity message){
-        message.setCreateTime(new Date());
-		messageService.save(message);
-
-        return R.ok();
-    }
-
-    /**
      * 修改
      */
     @RequestMapping("/update")
@@ -80,13 +65,6 @@ public class MessageController {
 		messageService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
-    }
-
-
-
-    @GetMapping("/messages")
-    public R messages() {
-        return R.ok("获取留言列表成功").put("data", messageService.list(new QueryWrapper<MessageEntity>().orderByDesc("create_time")));
     }
 
     @PostMapping("/messages/del/{id}")

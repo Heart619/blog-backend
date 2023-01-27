@@ -1,20 +1,16 @@
 package com.example.blog2.service.impl;
 
 import com.example.blog2.constant.ConstantImg;
-import com.example.blog2.po.User;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
 import com.example.blog2.utils.TokenUtil;
 import com.example.blog2.vo.PasswordUpdateVo;
 import com.example.blog2.vo.UserLoginVo;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
