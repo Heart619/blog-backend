@@ -1,6 +1,6 @@
 logging:
   file:
-    name: log.blog-dev.log
+    name: log/log.blog-dev.log
   level:
     com:
       example:

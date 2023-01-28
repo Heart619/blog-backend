@@ -1,6 +1,6 @@
 logging:
   file:
-    name: log.blog-pro.log
+    name: log/log.blog-pro.log
   level:
     com:
       example:
@@ -11,6 +11,12 @@ server:
     enabled: true
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
   port: 8090
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+  mapper-locations: classpath:/mapper/**/*.xml
 
 
 spring:
@@ -38,11 +44,11 @@ spring:
   #        deny: 192.168.56.1                                  # 访问监控页面 黑名单
   #        login-username: admin                               # 访问监控页面 登陆账号
   #        login-password: admin                               # 访问监控页面 登陆密码
-  #      filter:
-  #        stat:
-  #          enabled: true                                     # 是否开启 FilterStat，默认true
-  #          log-slow-sql: true                                # 是否开启 慢SQL 记录，默认false
-  #          slow-sql-millis: 5000                             # 慢 SQL 的标准，默认 3000，单位：毫秒
+#        filter:
+#          stat:
+#            log-slow-sql: true                                # 是否开启 慢SQL 记录，默认false
+  #            enabled: true                                     # 是否开启 FilterStat，默认true
+#            slow-sql-millis: 1000                              # 慢 SQL 的标准，默认 3000，单位：毫秒
   #          merge-sql: false                                  # 合并多个连接池的监控数据，默认false
 
 oss:

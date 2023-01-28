@@ -111,12 +111,6 @@ public class BlogController {
         return R.ok();
     }
 
-    @GetMapping("/search")
-    public R search(String query) {
-        List<BlogEntity> blogs = blogService.search(query);
-        return R.ok().put("data", blogs);
-    }
-
     @GetMapping("/getViewCountByMonth")
     public R getViewCountByMonth() {
         List<DateCountVo> res = blogService.getViewCountByMonth();

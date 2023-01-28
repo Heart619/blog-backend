@@ -86,7 +86,6 @@ public class OSSUtils {
             httpURLConnection.connect();
             BufferedInputStream inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            FileOutputStream fileOutputStream = new FileOutputStream("D:/test.jpg");
             byte[] t = new byte[1024 * 1024];
             int b;
             while ((b = inputStream.read(t)) != -1) {

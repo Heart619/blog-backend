@@ -50,4 +50,9 @@ public class BlogWebController {
         return R.ok().put("data", list);
     }
 
+    @GetMapping("/search")
+    public R search(String query) {
+        List<BlogEntity> blogs = blogService.search(query);
+        return R.ok().put("data", blogs);
+    }
 }
