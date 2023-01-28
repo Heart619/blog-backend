@@ -51,7 +51,7 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<PicturesEntity> page = this.page(
                 new Query<PicturesEntity>().getPage(params),
-                new QueryWrapper<PicturesEntity>()
+                new QueryWrapper<PicturesEntity>().eq("type", 2)
         );
 
         return new PageUtils(page);

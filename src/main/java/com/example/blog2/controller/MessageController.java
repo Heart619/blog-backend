@@ -58,11 +58,7 @@ public class MessageController {
 
     @PostMapping("/messages/del/{id}")
     public R delMsg(@PathVariable("id") Long id) {
-        try {
-            messageService.removeById(id);
-            return R.ok("留言删除成功成功").put("data", messageService.list(new QueryWrapper<MessageEntity>().orderByDesc("create_time")));
-        } catch (Exception e) {
-            return R.error("当前网络繁忙，就稍后再试");
-        }
+        messageService.removeById(id);
+        return R.ok("留言删除成功成功").put("data", messageService.list(new QueryWrapper<MessageEntity>().orderByDesc("create_time")));
     }
 }

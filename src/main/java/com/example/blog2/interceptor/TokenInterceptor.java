@@ -43,7 +43,7 @@ public class TokenInterceptor implements HandlerInterceptor {
             json.put("code", HttpStatus.UNAUTHORIZED.value());
             response.getWriter().append(json.toJSONString());
             response.sendRedirect("/error");
-            log.warn("认证失败，未通过拦截器");
+            log.error("认证失败，未通过拦截器, IP:{}", request.getRemoteAddr());
             return false;
         } catch (Exception e){
             response.sendRedirect("/error");

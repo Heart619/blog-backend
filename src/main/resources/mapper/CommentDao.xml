@@ -32,8 +32,9 @@
         order by create_time desc
         limit 4
     </select>
-    <select id="selectCommentCountByMonth" resultType="java.lang.String">
-        select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), count(*)) str from t_comment group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+    <select id="selectCommentCountByMonth" resultType="com.example.blog2.vo.DateCountVo">
+#         select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), count(*)) str from t_comment group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+        select DATE_FORMAT(create_time, '%Y-%m') `date`, count(*) `views` from t_comment group by `date` order by `date` desc
     </select>
     <select id="selectCommentCount" resultType="java.lang.Long">
         select count(*) from t_comment

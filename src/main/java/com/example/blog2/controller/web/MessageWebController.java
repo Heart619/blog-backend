@@ -35,13 +35,8 @@ public class MessageWebController {
 
     @PostMapping("/addMessage")
     public R save(@RequestBody MessageEntity message){
-        try {
-            message.setCreateTime(new Date());
-            messageService.save(message);
-            return R.ok().put("data", message);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        message.setCreateTime(new Date());
+        messageService.save(message);
+        return R.ok().put("data", message);
     }
 }

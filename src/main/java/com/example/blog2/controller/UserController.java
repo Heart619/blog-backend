@@ -80,15 +80,10 @@ public class UserController {
         return R.ok();
     }
 
-    @GetMapping("/del/{id}")
+    @PostMapping("/del/{id}")
     public R delUser(@PathVariable("id") Long id) {
-        try {
-            userService.removeUser(id);
-            return R.ok();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return R.error();
-        }
+        userService.removeUser(id);
+        return R.ok();
     }
 
     @GetMapping("/getUserAreaList")
@@ -99,22 +94,12 @@ public class UserController {
 
     @PostMapping("/setAvatar")
     public R setAvatar(@RequestBody UserEntity user) {
-        try {
-            UserEntity u =userService.setAvatar(user);
-            return R.ok().put("data", u);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return R.error();
-        }
+        UserEntity u =userService.setAvatar(user);
+        return R.ok().put("data", u);
     }
 
     @PostMapping("/updatePwd")
     public R updatePwd(@RequestBody PasswordUpdateVo vo) {
-        try {
-            return R.ok().put("data", userService.updatePwd(vo));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        return R.ok().put("data", userService.updatePwd(vo));
     }
 }

@@ -6,6 +6,7 @@ import com.example.blog2.entity.BlogEntity;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
 import com.example.blog2.vo.BlogCommentVo;
+import com.example.blog2.vo.DateCountVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
     }
 
     @Override
-    public List<String> getCommentCountByMonth() {
+    public List<DateCountVo> getCommentCountByMonth() {
         return baseMapper.selectCommentCountByMonth();
     }
 

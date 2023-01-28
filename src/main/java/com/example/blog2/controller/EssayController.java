@@ -40,14 +40,8 @@ public class EssayController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody EssayEntity essay){
-        try {
-            essayService.saveEssay(essay);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
-
+        essayService.saveEssay(essay);
+        return R.ok();
     }
 
     /**
@@ -70,7 +64,7 @@ public class EssayController {
         return R.ok();
     }
 
-    @GetMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public R delEssay(@PathVariable("id") Long id) {
         essayService.delEssayById(id);
         return R.ok();

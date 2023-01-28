@@ -43,13 +43,8 @@ public class ProjectController {
      */
     @PostMapping("/save")
     public R save(@RequestBody ProjectEntity project){
-        try {
-            projectService.addProject(project);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        projectService.addProject(project);
+        return R.ok();
     }
 
     /**
@@ -57,13 +52,8 @@ public class ProjectController {
      */
     @PostMapping("/update")
     public R update(@RequestBody ProjectEntity project){
-        try {
-            projectService.updateProject(project);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        projectService.updateProject(project);
+        return R.ok();
     }
 
     /**
@@ -71,13 +61,8 @@ public class ProjectController {
      */
     @PostMapping("/{id}/delete")
     public R delete(@PathVariable("id") Long id){
-        try {
-            projectService.removeProject(id);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        projectService.removeProject(id);
+        return R.ok();
     }
 
 }

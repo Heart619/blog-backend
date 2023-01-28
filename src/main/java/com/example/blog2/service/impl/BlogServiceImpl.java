@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.example.blog2.dao.BlogDao;
+import com.example.blog2.vo.DateCountVo;
 import com.example.blog2.vo.DelBlogTagVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -186,17 +187,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
     }
 
     @Override
-    public List<String> getViewCountByMonth() {
+    public List<DateCountVo> getViewCountByMonth() {
         return baseMapper.selectViewCountByMonth();
     }
 
     @Override
-    public List<String> getBlogCountByMonth() {
+    public List<DateCountVo> getBlogCountByMonth() {
         return baseMapper.selectBlogCountByMonth();
     }
 
     @Override
-    public List<String> getAppreciateCountByMonth() {
+    public List<DateCountVo> getAppreciateCountByMonth() {
         return baseMapper.selectAppreciateCountByMonth();
     }
 

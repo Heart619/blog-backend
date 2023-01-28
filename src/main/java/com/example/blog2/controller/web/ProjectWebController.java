@@ -25,10 +25,7 @@ public class ProjectWebController {
     private ProjectService projectService;
 
     @GetMapping("/list")
-    public R list(@RequestParam(required = false) Map<String, Object> params){
-        if (params == null) {
-            params = new HashMap<>(1);
-        }
+    public R list(@RequestParam Map<String, Object> params){
         PageUtils page = projectService.queryPage(params);
 
         return R.ok().put("page", page);

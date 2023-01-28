@@ -30,7 +30,7 @@ public class PicturesController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @GetMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = picturesService.queryPage(params);
 
@@ -53,14 +53,9 @@ public class PicturesController {
      */
     @PostMapping("/saveImg")
     public R save(@RequestBody PicturesEntity pictures){
-        try {
-            pictures.setBelong(-1L);
-            picturesService.save(pictures);
-            return R.ok().put("data", pictures.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error("网络繁忙，请稍后再试");
-        }
+        pictures.setBelong(-1L);
+        picturesService.save(pictures);
+        return R.ok().put("data", pictures.getId());
     }
 
     /**
@@ -78,26 +73,16 @@ public class PicturesController {
      */
     @PostMapping("/delete")
     public R delete(@RequestBody PicturesEntity pictures){
-        try {
-            picturesService.delPic(pictures);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        picturesService.delPic(pictures);
+        return R.ok();
     }
 
 
 
     @PostMapping("/upload")
-    public R upload(@RequestParam("file") MultipartFile file) {
-        try {
-            String img = picturesService.upload(file);
-            return R.ok().put("data", img);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return R.error();
-        }
+    public R upload(@RequestParam("file") MultipartFile file) throws IOException {
+        String img = picturesService.upload(file);
+        return R.ok().put("data", img);
     }
 
     @GetMapping("/getWallImg")

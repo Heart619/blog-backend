@@ -33,9 +33,15 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<TypeEntity> queryWrapper = new QueryWrapper<>();
+        String search = (String) params.get("search");
+        if (!StringUtils.isEmpty(search)) {
+            queryWrapper.like("name", search);
+        }
+
         IPage<TypeEntity> page = this.page(
                 new Query<TypeEntity>().getPage(params),
-                new QueryWrapper<TypeEntity>()
+                queryWrapper
         );
         setBlogNum(page.getRecords());
         return new PageUtils(page);

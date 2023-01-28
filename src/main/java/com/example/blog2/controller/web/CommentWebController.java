@@ -27,51 +27,31 @@ public class CommentWebController {
     @GetMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = commentService.queryBlogCommentPage(params);
-
         return R.ok().put("page", page);
     }
 
     @GetMapping("/comments/{blogId}")
     public R comments(@PathVariable Long blogId) {
-        List<CommentEntity> commentEntities;
-        try {
-            commentEntities = commentService.getCommentsByBlogId(blogId);
-            return R.ok("获取博客评论成功").put("data", commentEntities);
-        } catch (Exception e) {
-            return R.error("网络繁忙，请稍后再试");
-        }
+        List<CommentEntity> commentEntities = commentService.getCommentsByBlogId(blogId);
+        return R.ok("获取博客评论成功").put("data", commentEntities);
     }
 
     @GetMapping("/new/comments")
     public R getNewComments() {
-        try {
-            List<CommentEntity> commentEntities = commentService.getNewComments();
-            return R.ok().put("data", commentEntities);
-        } catch (Exception e) {
-            return R.error("网络繁忙，请稍后再试");
-        }
+        List<CommentEntity> commentEntities = commentService.getNewComments();
+        return R.ok().put("data", commentEntities);
     }
 
     @RequestMapping("/save")
     public R save(@RequestBody CommentEntity comment){
-        try {
-            comment.setCreateTime(new Date());
-            BlogCommentVo vo = commentService.addComment(comment);
-            return R.ok().put("data", vo);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error("网络繁忙，请稍后再试");
-        }
+        comment.setCreateTime(new Date());
+        BlogCommentVo vo = commentService.addComment(comment);
+        return R.ok().put("data", vo);
     }
 
     @GetMapping("/getCmt/{blog}/{cid}")
     public R getCmtByPmt(@PathVariable("blog") Long blog, @PathVariable("cid") Long cid) {
-        try {
-            List<BlogCommentVo> vos = commentService.getCmtByPmt(blog, cid);
-            return R.ok().put("data", vos);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        List<BlogCommentVo> vos = commentService.getCmtByPmt(blog, cid);
+        return R.ok().put("data", vos);
     }
 }

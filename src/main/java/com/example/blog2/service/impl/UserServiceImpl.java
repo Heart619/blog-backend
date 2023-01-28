@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.blog2.dao.UserDao;
 import com.example.blog2.entity.UserEntity;
 import com.example.blog2.service.UserService;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -49,9 +50,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+
+        String search = (String) params.get("search");
+        if (!StringUtils.isEmpty(search)) {
+            queryWrapper.like("nickname", search).or().like("username", search);
+        }
         IPage<UserEntity> page = this.page(
                 new Query<UserEntity>().getPage(params),
-                new QueryWrapper<UserEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);

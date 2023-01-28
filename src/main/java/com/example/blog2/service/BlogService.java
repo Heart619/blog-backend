@@ -5,6 +5,7 @@ import com.example.blog2.entity.TagEntity;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.entity.BlogEntity;
 import com.example.blog2.utils.R;
+import com.example.blog2.vo.DateCountVo;
 import com.example.blog2.vo.DelBlogTagVo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,19 +40,19 @@ public interface BlogService extends IService<BlogEntity> {
      * 根据月份统计阅读量
      * @return
      */
-    List<String> getViewCountByMonth();
+    List<DateCountVo> getViewCountByMonth();
 
     /**
      * 根据月份统计文章数
      * @return
      */
-    List<String> getBlogCountByMonth();
+    List<DateCountVo> getBlogCountByMonth();
 
     /**
      * 根据月份统计点赞数
      * @return
      */
-    List<String> getAppreciateCountByMonth();
+    List<DateCountVo> getAppreciateCountByMonth();
 
     /**
      * 获得文章总数

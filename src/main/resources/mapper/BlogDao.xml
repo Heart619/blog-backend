@@ -52,14 +52,17 @@
         order by create_time desc
         limit 3
     </select>
-    <select id="selectViewCountByMonth" resultType="java.lang.String">
-        select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), sum(views)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+    <select id="selectViewCountByMonth" resultType="com.example.blog2.vo.DateCountVo">
+#         select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), sum(views)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+        select DATE_FORMAT(create_time, '%Y-%m') `date`, sum(views) `views` from t_blog group by `date` order by `date` desc
     </select>
-    <select id="selectBlogCountByMonth" resultType="java.lang.String">
-        select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), count(*)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+    <select id="selectBlogCountByMonth" resultType="com.example.blog2.vo.DateCountVo">
+#         select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), count(*)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+        select DATE_FORMAT(create_time, '%Y-%m') `date`, count(*) `views` from t_blog group by `date` order by `date` desc
     </select>
-    <select id="selectAppreciateCountByMonth" resultType="java.lang.String">
-        select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), sum(appreciation)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+    <select id="selectAppreciateCountByMonth" resultType="com.example.blog2.vo.DateCountVo">
+#         select CONCAT_WS(',',DATE_FORMAT(create_time, '%Y-%m'), sum(appreciation)) str from t_blog group by DATE_FORMAT(create_time, '%Y-%m') order by DATE_FORMAT(create_time, '%Y-%m') desc
+        select DATE_FORMAT(create_time, '%Y-%m') `date`, sum(appreciation) `views` from t_blog group by `date` order by `date` desc
     </select>
     <select id="selectBlogCount" resultType="java.lang.Long">
         select count(*) from t_blog

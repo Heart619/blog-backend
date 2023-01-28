@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.blog2.entity.CommentEntity;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.vo.BlogCommentVo;
+import com.example.blog2.vo.DateCountVo;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public interface CommentService extends IService<CommentEntity> {
      * 根据月份统计评论数
      * @return
      */
-    List<String> getCommentCountByMonth();
+    List<DateCountVo> getCommentCountByMonth();
 
     /**
      * 统计总评论数

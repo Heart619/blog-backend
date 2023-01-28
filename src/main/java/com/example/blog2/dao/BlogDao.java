@@ -2,6 +2,7 @@ package com.example.blog2.dao;
 
 import com.example.blog2.entity.BlogEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.blog2.vo.DateCountVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -45,19 +46,19 @@ public interface BlogDao extends BaseMapper<BlogEntity> {
      * 根据月份统计阅读量
      * @return
      */
-    List<String> selectViewCountByMonth();
+    List<DateCountVo> selectViewCountByMonth();
 
     /**
      * 根据月份统计文章数
      * @return
      */
-    List<String> selectBlogCountByMonth();
+    List<DateCountVo> selectBlogCountByMonth();
 
     /**
      * 根据月份统计点赞数
      * @return
      */
-    List<String> selectAppreciateCountByMonth();
+    List<DateCountVo> selectAppreciateCountByMonth();
 
     /**
      * 获得文章总数

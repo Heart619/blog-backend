@@ -23,15 +23,10 @@ public class OssController {
 
     @GetMapping("oss/policy")
     public UploadTokenTo getToken() {
-        try {
-            Auth auth = Auth.create(ossConfig.getAccessKey(), ossConfig.getSecretKey());
-            UploadTokenTo token = new UploadTokenTo();
-            token.setToken(auth.uploadToken(ossConfig.getBucket()));
-            token.setDir(LocalDate.now().toString());
-            return token;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        Auth auth = Auth.create(ossConfig.getAccessKey(), ossConfig.getSecretKey());
+        UploadTokenTo token = new UploadTokenTo();
+        token.setToken(auth.uploadToken(ossConfig.getBucket()));
+        token.setDir(LocalDate.now().toString());
+        return token;
     }
 }

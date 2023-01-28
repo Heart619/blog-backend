@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
+import com.example.blog2.vo.DateCountVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,19 +68,15 @@ public class CommentController {
         return R.ok();
     }
 
-    @GetMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public R delete(@PathVariable Long id) {
-        try {
-            commentService.delComment(id);
-            return R.ok("删除成功");
-        } catch (Exception e) {
-            return R.error("网络繁忙，请稍后再试");
-        }
+        commentService.delComment(id);
+        return R.ok("删除成功");
     }
 
     @GetMapping("/getCommentCountByMonth")
     public R getCommentCountByMonth() {
-        List<String> res = commentService.getCommentCountByMonth();
+        List<DateCountVo> res = commentService.getCommentCountByMonth();
         return R.ok().put("data", res);
     }
 

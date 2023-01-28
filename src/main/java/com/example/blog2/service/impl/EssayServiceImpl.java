@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.blog2.dao.EssayDao;
 import com.example.blog2.entity.EssayEntity;
 import com.example.blog2.service.EssayService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -57,9 +58,14 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
     public PageUtils queryPage(Map<String, Object> params) {
         QueryWrapper<EssayEntity> queryWrapper = new QueryWrapper<>();
 
-        Object userId = params.get("userId");
-        if (userId != null) {
+        String userId = (String) params.get("userId");
+        if (!StringUtils.isEmpty(userId)) {
             queryWrapper.eq("author", userId);
+        }
+
+        String search = (String) params.get("search");
+        if (!StringUtils.isEmpty(search)) {
+            queryWrapper.like("title", search);
         }
 
         queryWrapper.orderByDesc("create_time");

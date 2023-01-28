@@ -29,9 +29,16 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<ProjectEntity> queryWrapper = new QueryWrapper<>();
+
+        String search = (String) params.get("search");
+        if (!StringUtils.isEmpty(search)) {
+            queryWrapper.like("title", search);
+        }
+
         IPage<ProjectEntity> page = this.page(
                 new Query<ProjectEntity>().getPage(params),
-                new QueryWrapper<ProjectEntity>()
+                queryWrapper
         );
 
         return new PageUtils(page);

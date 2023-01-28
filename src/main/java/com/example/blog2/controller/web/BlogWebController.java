@@ -7,9 +7,9 @@ import com.example.blog2.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author mxp
@@ -23,29 +23,19 @@ public class BlogWebController {
     @Autowired
     private BlogService blogService;
 
-    @RequestMapping("/list")
-    public R list(@RequestBody(required = false) Map<String, Object> params){
-        if (params == null) {
-            params = new HashMap<>(0);
-        }
+    @PostMapping("/list")
+    public R list(@RequestBody Map<String, Object> params){
         PageUtils page = blogService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 
     @GetMapping("/{blog}")
-    public R bolgInfo(@PathVariable("blog") Long id) {
-        BlogEntity blog;
-        try {
-            blog = blogService.getBlogInfo(id);
-            if (blog == null) {
-                return R.error("博客消失了");
-            }
-            return R.ok().put("data", blog);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error("网络繁忙，请稍后再试");
+    public R bolgInfo(@PathVariable("blog") Long id) throws ExecutionException, InterruptedException {
+        BlogEntity blog = blogService.getBlogInfo(id);
+        if (blog == null) {
+            return R.error("博客消失了");
         }
+        return R.ok().put("data", blog);
     }
 
     @GetMapping("/getRecommendBlogList")

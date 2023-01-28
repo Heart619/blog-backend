@@ -4,10 +4,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import com.example.blog2.entity.TagEntity;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
+import com.example.blog2.vo.DateCountVo;
 import com.example.blog2.vo.DelBlogTagVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,13 +46,9 @@ public class BlogController {
      * 保存
      */
     @RequestMapping("/save")
-    public R save(@RequestBody BlogEntity blog){
-        try {
-            if (blogService.addBlog(blog)) {
-                return R.ok();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public R save(@RequestBody BlogEntity blog) throws ExecutionException, InterruptedException {
+        if (blogService.addBlog(blog)) {
+            return R.ok();
         }
         return R.error();
     }
@@ -60,13 +58,8 @@ public class BlogController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody BlogEntity blog){
-        try {
-            blogService.updateBlog(blog);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        blogService.updateBlog(blog);
+        return R.ok();
     }
 
     /**
@@ -79,74 +72,43 @@ public class BlogController {
         return R.ok();
     }
 
-    @GetMapping("/{id}/delete")
-    public R delBlog(@PathVariable("id") Long id) {
-        try {
-            blogService.delBlog(id);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+    @PostMapping("/{id}/delete")
+    public R delBlog(@PathVariable("id") Long id) throws ExecutionException, InterruptedException {
+        blogService.delBlog(id);
+        return R.ok();
     }
 
     @GetMapping("/default/{blog}")
     public R bolgDefaultInfo(@PathVariable("blog") Long id) {
-        BlogEntity blog;
-        try {
-            blog = blogService.getDefaultBlogInfo(id);
-            if (blog == null) {
-                return R.error("博客消失了");
-            }
-            return R.ok().put("data", blog);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error("网络繁忙，请稍后再试");
+        BlogEntity blog = blogService.getDefaultBlogInfo(id);
+        if (blog == null) {
+            return R.error("博客消失了");
         }
+        return R.ok().put("data", blog);
     }
 
     @PostMapping("/updateImg")
     public R updateImg(@RequestBody BlogEntity blog) {
-        try {
-            blogService.updateImg(blog);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        blogService.updateImg(blog);
+        return R.ok();
     }
 
     @PostMapping("/updateType")
     public R updateType(@RequestBody BlogEntity blog) {
-        try {
-            blogService.updateType(blog);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        blogService.updateType(blog);
+        return R.ok();
     }
 
     @GetMapping("/{id}/createTag/{name}")
     public R createTag(@PathVariable("id") Long id, @PathVariable("name") String name) {
-        try {
-            TagEntity tag = blogService.createTag(id, name);
-            return R.ok().put("data", tag);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        TagEntity tag = blogService.createTag(id, name);
+        return R.ok().put("data", tag);
     }
 
     @PostMapping("/delTag")
     public R delTag(@RequestBody DelBlogTagVo vo) {
-        try {
-            blogService.delTag(vo);
-            return R.ok();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return R.error();
-        }
+        blogService.delTag(vo);
+        return R.ok();
     }
 
     @GetMapping("/search")
@@ -157,19 +119,19 @@ public class BlogController {
 
     @GetMapping("/getViewCountByMonth")
     public R getViewCountByMonth() {
-        List<String> res = blogService.getViewCountByMonth();
+        List<DateCountVo> res = blogService.getViewCountByMonth();
         return R.ok().put("data", res);
     }
 
     @GetMapping("/getBlogCountByMonth")
     public R getBlogCountByMonth() {
-        List<String> res = blogService.getBlogCountByMonth();
+        List<DateCountVo> res = blogService.getBlogCountByMonth();
         return R.ok().put("data", res);
     }
 
     @GetMapping("/getAppreciateCountByMonth")
     public R getAppreciateCountByMonth() {
-        List<String> res = blogService.getAppreciateCountByMonth();
+        List<DateCountVo> res = blogService.getAppreciateCountByMonth();
         return R.ok().put("data", res);
     }
 

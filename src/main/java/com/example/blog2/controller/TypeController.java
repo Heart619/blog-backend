@@ -45,13 +45,8 @@ public class TypeController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody TypeEntity type){
-        try {
-            TypeEntity t = typeService.addType(type);
-            return R.ok().put("data", t);
-        } catch (Exception e) {
-            return R.error(e.getMessage());
-        }
-
+        TypeEntity t = typeService.addType(type);
+        return R.ok().put("data", t);
     }
 
     /**
@@ -59,13 +54,8 @@ public class TypeController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody TypeEntity type){
-        try {
-            typeService.updateType(type);
-            return R.ok();
-        } catch (Exception e) {
-            return R.error(e.getMessage());
-        }
-
+        typeService.updateType(type);
+        return R.ok();
     }
 
     /**
@@ -79,16 +69,12 @@ public class TypeController {
 
     @PostMapping("/{id}/delete")
     public R delete(@PathVariable Long id) {
-        try {
-            TypeEntity type = typeService.getById(id);
-            typeService.removeById(id);
-            if (!StringUtils.isEmpty(type.getPicUrl())) {
-                ossUtils.del(type.getPicUrl());
-            }
-            return R.ok("删除成功");
-        } catch (Exception e) {
-            return R.error();
+        TypeEntity type = typeService.getById(id);
+        typeService.removeById(id);
+        if (!StringUtils.isEmpty(type.getPicUrl())) {
+            ossUtils.del(type.getPicUrl());
         }
+        return R.ok("删除成功");
     }
 
 }

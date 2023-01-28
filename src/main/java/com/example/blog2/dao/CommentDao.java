@@ -2,6 +2,7 @@ package com.example.blog2.dao;
 
 import com.example.blog2.entity.CommentEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.blog2.vo.DateCountVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -34,7 +35,7 @@ public interface CommentDao extends BaseMapper<CommentEntity> {
      * 根据月份统计评论数
      * @return
      */
-    List<String> selectCommentCountByMonth();
+    List<DateCountVo> selectCommentCountByMonth();
 
     /**
      * 统计总评论数

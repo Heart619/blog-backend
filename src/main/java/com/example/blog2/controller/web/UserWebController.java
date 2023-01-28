@@ -28,29 +28,18 @@ public class UserWebController {
 
     @PostMapping("/login")
     public R login(@RequestBody UserEntity user) {
-        try {
-            UserLoginVo res = userService.login(user);
-            if (res == null) {
-                return R.error("用户名或密码错误");
-            }
-            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            log.info("用户 {} 登陆，登陆地点：{}-{}, IP：{}", res.getUser().getNickname(), res.getUser().getLoginProvince(), res.getUser().getLoginCity(), attributes.getRequest().getRemoteAddr());
-            return R.ok("登陆成功").put("data", res);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return R.error(e.getMessage());
+        UserLoginVo res = userService.login(user);
+        if (res == null) {
+            return R.error("用户名或密码错误");
         }
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        log.info("用户 {} 登陆，登陆地点：{}-{}, IP：{}", res.getUser().getNickname(), res.getUser().getLoginProvince(), res.getUser().getLoginCity(), attributes.getRequest().getRemoteAddr());
+        return R.ok("登陆成功").put("data", res);
     }
 
     @PostMapping("/register")
     public R register(@RequestBody UserEntity user) {
-        UserLoginVo vo = null;
-        try {
-            vo = userService.register(user);
-            return R.ok().put("data", vo);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return R.error();
-        }
+        UserLoginVo vo = userService.register(user);
+        return R.ok().put("data", vo);
     }
 }
