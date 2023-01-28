@@ -21,4 +21,11 @@ public interface MessageDao extends BaseMapper<MessageEntity> {
      * @param defaultAvatar
      */
     void updateUserMessage(@Param("id") Long id, @Param("defaultAvatar") String defaultAvatar);
+
+    /**
+     * 更新留言信息中的用户昵称
+     * @param id
+     * @param nickname
+     */
+    void updateMessageForUserUpdate(@Param("id") Long id, @Param("nickname") String nickname);
 }

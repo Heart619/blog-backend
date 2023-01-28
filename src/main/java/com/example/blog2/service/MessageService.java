@@ -22,5 +22,12 @@ public interface MessageService extends IService<MessageEntity> {
      * @param id
      */
     void userDelUpdateMessage(Long id);
+
+    /**
+     * 更新留言信息中的用户昵称
+     * @param id
+     * @param nickname
+     */
+    void updateMessageForUserUpdate(Long id, String nickname);
 }
 

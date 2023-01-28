@@ -36,5 +36,12 @@ public interface TagService extends IService<TagEntity> {
      * @return
      */
     TagEntity updateTag(TagEntity tag);
+
+    /**
+     * 删除标签
+     * @param id
+     * @return
+     */
+    boolean delTag(Long id);
 }
 

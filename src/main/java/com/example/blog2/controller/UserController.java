@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.example.blog2.constant.ConstantUser;
+import com.example.blog2.exception.UserExistsNickNameException;
+import com.example.blog2.exception.UserExistsUserNameException;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
 import com.example.blog2.vo.PasswordUpdateVo;
@@ -65,9 +68,14 @@ public class UserController {
      */
     @RequestMapping("/update")
     public R update(@RequestBody UserEntity user){
-		userService.updateById(user);
-
-        return R.ok();
+        try {
+            userService.updateUser(user);
+            return R.ok("更新成功");
+        } catch (UserExistsNickNameException e) {
+            return R.error(ConstantUser.EXISTS_NICK_NAME);
+        } catch (UserExistsUserNameException e) {
+            return R.error(ConstantUser.EXISTS_USER_NAME);
+        }
     }
 
     /**

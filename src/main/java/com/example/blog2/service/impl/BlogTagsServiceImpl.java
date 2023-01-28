@@ -15,6 +15,9 @@ import com.example.blog2.entity.BlogTagsEntity;
 import com.example.blog2.service.BlogTagsService;
 
 
+/**
+ * @author mxp
+ */
 @Service("blogTagsService")
 public class BlogTagsServiceImpl extends ServiceImpl<BlogTagsDao, BlogTagsEntity> implements BlogTagsService {
 

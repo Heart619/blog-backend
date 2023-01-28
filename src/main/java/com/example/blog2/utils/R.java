@@ -1,5 +1,6 @@
 package com.example.blog2.utils;
 
+import com.example.blog2.constant.ConstantUser;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
@@ -36,6 +37,10 @@ public class R<T> extends HashMap<String, Object> {
 
 	public static R error() {
 		return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, "未知异常，请联系管理员");
+	}
+
+	public static R error(ConstantUser constantUser) {
+		return error(constantUser.getCode(), constantUser.getMsg());
 	}
 
 	public static R error(String msg) {

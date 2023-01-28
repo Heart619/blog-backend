@@ -26,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -130,7 +128,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
                     x.setUserAvatar(user.getAvatar());
                     x.setUserNickName(user.getNickname());
                 } else {
-                    x.setUserAvatar(ConstantImg.DEFAULT_AVATAR);
+                    x.setUserAvatar(DefaultImgUtils.getDefaultAvatarImg());
                     x.setUserNickName("用户已注销");
                 }
                 x.setTypeName(type == null ? "" : type.getName());
@@ -241,7 +239,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
                 blog.setUserNickName(user.getNickname());
             } else {
                 blog.setUserNickName("用户已注销");
-                blog.setUserAvatar(ConstantImg.DEFAULT_AVATAR);
+                blog.setUserAvatar(DefaultImgUtils.getDefaultAvatarImg());
             }
         }, executor);
 
@@ -277,7 +275,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             // 删除博客内容
             BlogEntity blog = getById(id);
             String img = blog.getFirstPicture();
-            if (!StringUtils.isEmpty(img) && !ConstantImg.DEFAULT_IMG.equals(img)) {
+            if (!DefaultImgUtils.isDefaultBackImg(img)) {
                 ossUtils.del(blog.getFirstPicture());
             }
             ossUtils.del(blog.getContent());
@@ -308,7 +306,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
     @Override
     public void updateImg(BlogEntity blog) {
         BlogEntity entity = getById(blog.getId());
-        if (!StringUtils.isEmpty(entity.getFirstPicture()) && !ConstantImg.DEFAULT_IMG.equals(entity.getFirstPicture())) {
+        if (!DefaultImgUtils.isDefaultBackImg(entity.getFirstPicture())) {
             ossUtils.del(entity.getFirstPicture());
         }
 
@@ -353,7 +351,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             blog.setUpdateTime(new Date());
             blog.setDescription(blog.getContent().substring(0, Math.min(120, blog.getContent().length())));
             if (StringUtils.isEmpty(blog.getFirstPicture())) {
-                blog.setFirstPicture(ConstantImg.DEFAULT_IMG);
+                blog.setFirstPicture(DefaultImgUtils.getDefaultBackImg());
             }
             String k = ossConfig.getBlog() + LocalDate.now() + "/" + UUID.randomUUID();
             ossUtils.upload(k, blog.getContent().getBytes(StandardCharsets.UTF_8));

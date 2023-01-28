@@ -68,10 +68,10 @@
         select count(*) from t_blog
     </select>
     <select id="selectViewCount" resultType="java.lang.Long">
-        select sum(views) from t_blog;
+        select IFNULL(sum(views), 0) from t_blog;
     </select>
     <select id="selectAppreciateCount" resultType="java.lang.Long">
-        select sum(appreciation) from t_blog;
+        select IFNULL(sum(appreciation), 0) from t_blog;
     </select>
     <select id="selectCondition" resultType="com.example.blog2.entity.BlogEntity">
         select id, title

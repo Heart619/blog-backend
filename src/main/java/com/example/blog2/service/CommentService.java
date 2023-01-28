@@ -77,5 +77,12 @@ public interface CommentService extends IService<CommentEntity> {
      * @return
      */
     BlogCommentVo addComment(CommentEntity comment);
+
+    /**
+     * 更新评论中的用户昵称
+     * @param id
+     * @param nickname
+     */
+    void updateCommentForUserUpdate(Long id, String nickname);
 }
 

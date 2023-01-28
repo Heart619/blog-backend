@@ -2,6 +2,7 @@ package com.example.blog2.service.impl;
 
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.utils.Constant;
+import com.example.blog2.utils.DefaultImgUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, MessageEntity> i
 
     @Override
     public void userDelUpdateMessage(Long id) {
-        this.baseMapper.updateUserMessage(id, ConstantImg.DEFAULT_AVATAR);
+        this.baseMapper.updateUserMessage(id, DefaultImgUtils.getDefaultAvatarImg());
+    }
+
+    @Override
+    public void updateMessageForUserUpdate(Long id, String nickname) {
+        baseMapper.updateMessageForUserUpdate(id, nickname);
     }
 
 }

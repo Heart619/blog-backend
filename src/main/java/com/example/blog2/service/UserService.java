@@ -2,6 +2,10 @@ package com.example.blog2.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.blog2.entity.UserEntity;
+import com.example.blog2.exception.UserExistsNickNameException;
+import com.example.blog2.exception.UserExistsUserNameException;
+import com.example.blog2.exception.UserNotFoundException;
+import com.example.blog2.exception.UserPasswordErrorException;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.vo.PasswordUpdateVo;
 import com.example.blog2.vo.UserLoginVo;
@@ -27,15 +31,19 @@ public interface UserService extends IService<UserEntity> {
      * 用户登录
      * @param user
      * @return
+     * @throws UserNotFoundException
+     * @throws UserPasswordErrorException
      */
-    UserLoginVo login(UserEntity user);
+    UserLoginVo login(UserEntity user) throws UserNotFoundException, UserPasswordErrorException;
 
     /**
      * 注册
      * @param user
      * @return
+     * @throws UserExistsNickNameException
+     * @throws UserExistsUserNameException
      */
-    UserLoginVo register(UserEntity user);
+    UserLoginVo register(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException;
 
     /**
      * 修改头像
@@ -61,5 +69,13 @@ public interface UserService extends IService<UserEntity> {
      * @param id
      */
     void removeUser(Long id);
+
+    /**
+     * 更新用户信息
+     * @param user
+     * @throws UserExistsNickNameException
+     * @throws UserExistsUserNameException
+     */
+    void updateUser(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException;
 }
 

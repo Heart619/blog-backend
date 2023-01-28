@@ -49,4 +49,11 @@ public interface CommentDao extends BaseMapper<CommentEntity> {
      * @param defaultAvatar
      */
     void userDelUpdateComment(@Param("id") Long id, @Param("defaultAvatar") String defaultAvatar);
+
+    /**
+     * 更新评论信息中的用户昵称
+     * @param id
+     * @param nickname
+     */
+    void updateCommentForUserUpdate(@Param("id") Long id, @Param("nickname") String nickname);
 }

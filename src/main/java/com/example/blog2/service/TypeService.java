@@ -38,5 +38,12 @@ public interface TypeService extends IService<TypeEntity> {
      * @return
      */
     TypeEntity updateType(TypeEntity tag);
+
+    /**
+     * 删除类型
+     * @param id
+     * @return
+     */
+    boolean delType(Long id);
 }
 

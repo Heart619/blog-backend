@@ -17,6 +17,11 @@
         nickname = '匿名用户', avatar = #{defaultAvatar}, user_id = -1
         where user_id = #{id}
     </update>
+    <update id="updateMessageForUserUpdate">
+        update t_message
+        set nickname = #{nickname}
+        where user_id = #{id}
+    </update>
 
 
 </mapper>

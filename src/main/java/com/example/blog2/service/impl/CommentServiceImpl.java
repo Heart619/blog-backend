@@ -3,6 +3,7 @@ package com.example.blog2.service.impl;
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.BlogDao;
 import com.example.blog2.entity.BlogEntity;
+import com.example.blog2.utils.DefaultImgUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
 import com.example.blog2.vo.BlogCommentVo;
@@ -78,7 +79,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
 
     @Override
     public void userDelUpdateComment(Long id) {
-        this.baseMapper.userDelUpdateComment(id, ConstantImg.DEFAULT_AVATAR);
+        this.baseMapper.userDelUpdateComment(id, DefaultImgUtils.getDefaultAvatarImg());
     }
 
     @Override
@@ -124,6 +125,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
         commentVo.setParentComment(null);
         commentVo.setChildren(Collections.emptyList());
         return commentVo;
+    }
+
+    @Override
+    public void updateCommentForUserUpdate(Long id, String nickname) {
+        baseMapper.updateCommentForUserUpdate(id, nickname);
     }
 
     private void delChildrenComment(Long faId) {

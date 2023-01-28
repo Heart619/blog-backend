@@ -60,7 +60,10 @@ public class TagController {
 
     @PostMapping("/{id}/delete")
     public R delete(@PathVariable Long id) {
-        tagService.removeById(id);
+        boolean res = tagService.delTag(id);
+        if (!res) {
+            return R.error("当前标签正在被使用，无法删除");
+        }
         return R.ok("删除成功");
     }
 

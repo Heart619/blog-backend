@@ -34,10 +34,6 @@ public class CommentEntity implements Serializable {
 	 */
 	private String avatar;
 	/**
-	 * 邮箱
-	 */
-	private String email;
-	/**
 	 * 昵称
 	 */
 	private String nickname;

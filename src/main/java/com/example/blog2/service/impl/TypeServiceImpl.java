@@ -2,11 +2,10 @@ package com.example.blog2.service.impl;
 
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.BlogDao;
+import com.example.blog2.entity.BlogEntity;
 import com.example.blog2.entity.TagEntity;
 import com.example.blog2.service.TypeService;
-import com.example.blog2.utils.Constant;
-import com.example.blog2.utils.PageUtils;
-import com.example.blog2.utils.Query;
+import com.example.blog2.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +29,9 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
 
     @Autowired
     private BlogDao blogDao;
+
+    @Autowired
+    private OSSUtils ossUtils;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -61,7 +63,7 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
         }
 
         if (StringUtils.isEmpty(typeEntity.getPicUrl())) {
-            typeEntity.setPicUrl(ConstantImg.DEFAULT_IMG);
+            typeEntity.setPicUrl(DefaultImgUtils.getDefaultBackImg());
         }
         save(typeEntity);
         return typeEntity;
@@ -76,6 +78,22 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
         return type;
     }
 
+    @Override
+    public boolean delType(Long id) {
+        BlogEntity blog = blogDao.selectOne(new QueryWrapper<BlogEntity>().eq("type_id", id));
+        if (blog != null) {
+            return false;
+        }
+
+        TypeEntity type = getById(id);
+        if (!DefaultImgUtils.isDefaultBackImg(type.getPicUrl())) {
+            ossUtils.del(type.getPicUrl());
+        }
+        removeById(id);
+
+        return true;
+    }
+
     private void setBlogNum(List<TypeEntity> list) {
         List<Long> ids = blogDao.selectAllBlogTypeId();
         Map<Long, Integer> map = new HashMap<>(list.size());
@@ -87,5 +105,7 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
         TypeEntity entity = getOne(new QueryWrapper<TypeEntity>().eq("name", name));
         return entity != null;
     }
+
+
 
 }

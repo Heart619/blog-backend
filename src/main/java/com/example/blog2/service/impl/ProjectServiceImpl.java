@@ -1,10 +1,7 @@
 package com.example.blog2.service.impl;
 
 import com.example.blog2.constant.ConstantImg;
-import com.example.blog2.utils.Constant;
-import com.example.blog2.utils.OSSUtils;
-import com.example.blog2.utils.PageUtils;
-import com.example.blog2.utils.Query;
+import com.example.blog2.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Map;
@@ -47,7 +44,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
     @Override
     public void removeProject(Long id) {
         ProjectEntity project = getById(id);
-        if (!ConstantImg.DEFAULT_IMG.equals(project.getPicUrl())) {
+        if (!DefaultImgUtils.isDefaultBackImg(project.getPicUrl())) {
             ossUtils.del(project.getPicUrl());
         }
         removeById(id);
@@ -67,7 +64,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
     @Override
     public void addProject(ProjectEntity project) {
         if (StringUtils.isEmpty(project.getPicUrl())) {
-            project.setPicUrl(ConstantImg.DEFAULT_IMG);
+            project.setPicUrl(DefaultImgUtils.getDefaultBackImg());
         }
 
         save(project);

@@ -26,6 +26,9 @@ import com.example.blog2.entity.TagEntity;
 @Service
 public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements TagService {
 
+    @Autowired
+    private BlogTagsService blogTagsService;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<TagEntity> page = this.page(
@@ -60,6 +63,16 @@ public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements Ta
         }
         updateById(tag);
         return tag;
+    }
+
+    @Override
+    public boolean delTag(Long id) {
+        BlogTagsEntity entity = blogTagsService.getOne(new QueryWrapper<BlogTagsEntity>().eq("tags_id", id));
+        if (entity != null) {
+            return false;
+        }
+        removeById(id);
+        return true;
     }
 
     private void setBlogNum(List<TagEntity> list) {

@@ -2,9 +2,11 @@ package com.example.blog2.service.impl;
 
 import com.example.blog2.config.OSSConfig;
 import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.entity.PicturesEntity;
 import com.example.blog2.entity.UserEntity;
 import com.example.blog2.service.UserService;
 import com.example.blog2.service.PicturesService;
+import com.example.blog2.utils.DefaultImgUtils;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
@@ -25,6 +27,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.blog2.dao.EssayDao;
 import com.example.blog2.entity.EssayEntity;
 import com.example.blog2.service.EssayService;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -84,7 +87,7 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
                 x.setAvatar(user.getAvatar());
             } else {
                 x.setNickName("用户已注销");
-                x.setAvatar(ConstantImg.DEFAULT_AVATAR);
+                x.setAvatar(DefaultImgUtils.getDefaultAvatarImg());
             }
         });
         return new PageUtils(page);
@@ -148,8 +151,24 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
     @Override
     public void delEssayById(Long id) {
         EssayEntity essay = getById(id);
-        ossUtils.del(essay.getContent());
         removeById(id);
+
+        CompletableFuture.runAsync(() -> {
+            // 删除随笔内容
+            ossUtils.del(essay.getContent());
+        }, executor);
+
+        CompletableFuture.runAsync(() -> {
+            // 删除随笔所包含的图片（如果有）
+            List<PicturesEntity> entities = picturesService.list(new QueryWrapper<PicturesEntity>().eq("type", 0).eq("belong", id));
+            if (!CollectionUtils.isEmpty(entities)) {
+                List<Long> longs = entities.stream().map(x -> {
+                    ossUtils.del(x.getImage());
+                    return x.getId();
+                }).collect(Collectors.toList());
+                picturesService.removeByIds(longs);
+            }
+        }, executor);
     }
 
 }

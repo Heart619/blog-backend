@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.example.blog2.utils.DefaultImgUtils;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
@@ -69,10 +70,9 @@ public class TypeController {
 
     @PostMapping("/{id}/delete")
     public R delete(@PathVariable Long id) {
-        TypeEntity type = typeService.getById(id);
-        typeService.removeById(id);
-        if (!StringUtils.isEmpty(type.getPicUrl())) {
-            ossUtils.del(type.getPicUrl());
+        boolean res = typeService.delType(id);
+        if (!res) {
+            return R.error("当前分类正在被使用，无法删除");
         }
         return R.ok("删除成功");
     }

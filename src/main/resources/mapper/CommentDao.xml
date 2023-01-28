@@ -8,7 +8,6 @@
         <result property="id" column="id"/>
         <result property="userId" column="user_id"/>
         <result property="avatar" column="avatar"/>
-        <result property="email" column="email"/>
         <result property="nickname" column="nickname"/>
         <result property="blogId" column="blog_id"/>
         <result property="parentCommentId" column="parent_comment_id"/>
@@ -17,8 +16,13 @@
         <result property="createTime" column="create_time"/>
     </resultMap>
     <update id="userDelUpdateComment">
-        update t_comment set
-        avatar = #{defaultAvatar}, email = '', nickname = '用户已注销'
+        update t_comment
+        set avatar = #{defaultAvatar}, email = '', nickname = '用户已注销'
+        where user_id = #{id}
+    </update>
+    <update id="updateCommentForUserUpdate">
+        update t_comment
+        set nickname = #{nickname}
         where user_id = #{id}
     </update>
     <select id="selectChilderComment" parameterType="long" resultType="java.lang.Long">
