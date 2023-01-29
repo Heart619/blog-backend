@@ -8,9 +8,8 @@ import org.commonmark.node.Link;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.AttributeProvider;
-import org.commonmark.renderer.html.AttributeProviderContext;
-import org.commonmark.renderer.html.AttributeProviderFactory;
 import org.commonmark.renderer.html.HtmlRenderer;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -51,11 +50,7 @@ public class MarkdownUtils {
         HtmlRenderer renderer = HtmlRenderer.builder()
                 .extensions(headingAnchorExtensions)
                 .extensions(tableExtension)
-                .attributeProviderFactory(new AttributeProviderFactory() {
-                    public AttributeProvider create(AttributeProviderContext context) {
-                        return new CustomAttributeProvider();
-                    }
-                })
+                .attributeProviderFactory(context -> new CustomAttributeProvider())
                 .build();
         return renderer.render(document);
     }
@@ -68,7 +63,12 @@ public class MarkdownUtils {
         public void setAttributes(Node node, String tagName, Map<String, String> attributes) {
             //改变a标签的target属性为_blank
             if (node instanceof Link) {
-                attributes.put("target", "_blank");
+                Link link = (Link) node;
+                if (!StringUtils.isEmpty(link.getDestination()) && !link.getDestination().startsWith("#")) {
+                    attributes.put("target", "_blank");
+                } else {
+                    attributes.put("target", "_self");
+                }
             }
             if (node instanceof TableBlock) {
                 attributes.put("class", "ui celled table");

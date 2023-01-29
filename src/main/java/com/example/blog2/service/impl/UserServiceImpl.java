@@ -90,8 +90,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         u.setLoginCity(user.getLoginCity());
         u.setLoginLat(user.getLoginLat());
         u.setLoginLng(user.getLoginLng());
-        user.setLastLoginTime(new Date());
         u.setLastLoginTime(user.getLastLoginTime());
+        user.setLastLoginTime(new Date());
         user.setId(u.getId());
         updateById(user);
 
@@ -174,6 +174,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     private void checkUserNameAndNickName(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException {
         UserEntity one = getOne(new QueryWrapper<UserEntity>().eq("nickname", user.getNickname()).or().eq("username", user.getUsername()));
         if (one == null) {
+            return;
+        }
+
+        if (user.getId() != null && user.getId().equals(one.getId())) {
             return;
         }
 
