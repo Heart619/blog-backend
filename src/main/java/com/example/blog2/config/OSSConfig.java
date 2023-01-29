@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author mxp
  * @date 2023/1/23 20:37
  */
-@ConfigurationProperties(prefix = "oss")
+@ConfigurationProperties(prefix = "three.oss")
 @Data
 public class OSSConfig {
     private String accessKey;
