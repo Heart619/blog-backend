@@ -1,5 +1,6 @@
 package com.example.blog2.handler;
 
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class ControllerExceptionHandler {
         if (AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class) != null){
             throw e;
         }
-        log.error("Request URL : {}, Exception : {}",request.getRequestURL(), e.getMessage());
+        log.error("IP : {}, Request URL : {}, Exception : {}", IPInterceptor.IP_INFO.get(), request.getRequestURL(), e.getMessage());
         return R.error("网络繁忙，请稍后再试");
     }
 }

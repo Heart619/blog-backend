@@ -2,10 +2,12 @@ package com.example.blog2.service.impl;
 
 import com.example.blog2.entity.BlogEntity;
 import com.example.blog2.entity.BlogTagsEntity;
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.service.BlogTagsService;
 import com.example.blog2.service.TagService;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,8 @@ import com.example.blog2.entity.TagEntity;
  *
  * @author mxp
  */
+
+@Slf4j
 @Service
 public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements TagService {
 
@@ -37,6 +41,8 @@ public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements Ta
         );
         List<TagEntity> records = page.getRecords();
         setBlogNum(records);
+
+//        log.info("IP：{}， 分页查询标签", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
@@ -44,6 +50,8 @@ public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements Ta
     public List<TagEntity> getAllTag() {
         List<TagEntity> res = list();
         setBlogNum(res);
+
+//        log.info("IP：{}， 查询所有标签信息", IPInterceptor.IP_INFO.get());
         return res;
     }
 
@@ -53,6 +61,8 @@ public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements Ta
             throw new RuntimeException("标签名称重复");
         }
         save(tag);
+
+        log.info("IP：{}， 新增标签[{}]", IPInterceptor.IP_INFO.get(), tag.getName());
         return tag;
     }
 
@@ -62,16 +72,20 @@ public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements Ta
             throw new RuntimeException("标签名称重复");
         }
         updateById(tag);
+
+        log.info("IP：{}， 更新标签", IPInterceptor.IP_INFO.get());
         return tag;
     }
 
     @Override
     public boolean delTag(Long id) {
-        BlogTagsEntity entity = blogTagsService.getOne(new QueryWrapper<BlogTagsEntity>().eq("tags_id", id));
+        BlogTagsEntity entity = blogTagsService.getOne(new QueryWrapper<BlogTagsEntity>().eq("tags_id", id).last("limit 1"));
         if (entity != null) {
             return false;
         }
         removeById(id);
+
+        log.info("IP：{}， 删除标签", IPInterceptor.IP_INFO.get());
         return true;
     }
 
@@ -83,7 +97,7 @@ public class TagServiceImpl extends ServiceImpl<TagDao, TagEntity> implements Ta
     }
 
     private boolean existsName(String name) {
-        TagEntity entity = getOne(new QueryWrapper<TagEntity>().eq("name", name));
+        TagEntity entity = getOne(new QueryWrapper<TagEntity>().eq("name", name).last("limit 1"));
         return entity != null;
     }
 

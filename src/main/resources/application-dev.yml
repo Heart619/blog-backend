@@ -1,6 +1,6 @@
 logging:
   file:
-    name: log/log.blog-dev.log
+    name: logs/
   level:
     com:
       example:
@@ -22,7 +22,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: 123456
-    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.88.130:3306/blog?useUnicode=true&characterEncoding=utf-8
+#    url: jdbc:mysql://127.0.0.1:3306/blog?useUnicode=true&characterEncoding=utf-8
     username: root
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
@@ -33,13 +34,16 @@ spring:
       min-evictable-idle-time-millis: 300000                # 一个连接在池中最小生存的时间，单位是毫秒
       time-between-eviction-runs-millis: 90000              # 多久才进行一次检测需要关闭的空闲连接，单位是毫秒
 
-oss:
-  accessKey: Djaw32O83II324ZtpxvlCmUH1FTi7hOuOVr6vRuN
-  blog: text/blog/
-  bucket: mxp-blog
-  essay: text/essay/
-  region: http://roxuynt15.hd-bkt.clouddn.com
-  secretKey: 6nX92UklXiZf7KOYBtTVOss3xG4RGvP4O1mYmi3s
+three:
+  oss:
+    accessKey: Djaw32O83II324ZtpxvlCmUH1FTi7hOuOVr6vRuN
+    blog: text/blog/
+    bucket: mxp-blog
+    essay: text/essay/
+    region: http://roxuynt15.hd-bkt.clouddn.com
+    secretKey: 6nX92UklXiZf7KOYBtTVOss3xG4RGvP4O1mYmi3s
+  location:
+    key: FJNBZ-4B6KX-UJM4X-ZWZUG-DPMMS-GQFXD
 
 my:
   thread:

@@ -4,6 +4,7 @@ import com.example.blog2.config.OSSConfig;
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.UserDao;
 import com.example.blog2.entity.*;
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.service.*;
 import com.example.blog2.utils.*;
 
@@ -22,6 +23,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.blog2.dao.BlogDao;
 import com.example.blog2.vo.DateCountVo;
 import com.example.blog2.vo.DelBlogTagVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -38,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author mxp
  */
+@Slf4j
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements BlogService {
 
@@ -171,16 +174,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             e.printStackTrace();
         }
 
+        log.info("IP：{}， 博客首页访问", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
     @Override
     public List<BlogEntity> getRecommedBlog() {
+//        log.info("IP：{}， 推荐博客列表获取", IPInterceptor.IP_INFO.get());
         return baseMapper.selectRecommedBlog();
     }
 
     @Override
     public List<BlogEntity> getNewBlog() {
+//        log.info("IP：{}， 读取最新博客", IPInterceptor.IP_INFO.get());
         return baseMapper.selectNewBlog();
     }
 
@@ -261,11 +267,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
         }, executor);
 
         CompletableFuture.allOf(tag, type, content, author).get();
+
+        log.info("IP：{}， 查看博客[{}]", IPInterceptor.IP_INFO.get(), blog.getTitle());
         return blog;
     }
 
     @Override
     public List<BlogEntity> search(String query) {
+        log.info("IP：{}， 查询[{}]", IPInterceptor.IP_INFO.get(), query);
         return baseMapper.selectCondition(query);
     }
 
@@ -279,6 +288,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
                 ossUtils.del(blog.getFirstPicture());
             }
             ossUtils.del(blog.getContent());
+
+            log.info("IP：{}， 删除博客[{}]", IPInterceptor.IP_INFO.get(), blog.getTitle());
         }, executor);
 
         // 删除博客图片
@@ -339,6 +350,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
         }, executor);
 
         updateById(blog);
+        log.info("IP：{}，用户[{}], 更新博客[{}]", IPInterceptor.IP_INFO.get(), blog.getUserId(), blog.getTitle());
     }
 
     @Override
@@ -392,7 +404,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 //                    platformTransactionManager.commit(s);
 //                }
 //            }
-            return true;
+        log.info("IP：{}，用户[{}], 新增博客[{}]", IPInterceptor.IP_INFO.get(), blog.getUserId(), blog.getTitle());
+        return true;
 //        } catch (Exception e) {
 //            for (TransactionStatus s : status) {
 //                if (s.isCompleted()) {

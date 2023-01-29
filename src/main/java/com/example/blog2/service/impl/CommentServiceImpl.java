@@ -3,11 +3,13 @@ package com.example.blog2.service.impl;
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.BlogDao;
 import com.example.blog2.entity.BlogEntity;
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.utils.DefaultImgUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
 import com.example.blog2.vo.BlogCommentVo;
 import com.example.blog2.vo.DateCountVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ import org.springframework.util.CollectionUtils;
 /**
  * @author mxp
  */
+
+@Slf4j
 @Service
 public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> implements CommentService {
 
@@ -48,6 +52,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
             x.setBlogTitle(map.getOrDefault(x.getBlogId(), "暂无......"));
         });
         page.setRecords(records);
+
+//        log.info("IP：{}， 分页查询评论", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
@@ -60,6 +66,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
     public void delComment(Long id) {
         delChildrenComment(id);
         removeById(id);
+        log.info("IP：{}， 删除评论", IPInterceptor.IP_INFO.get());
     }
 
     @Override
@@ -101,6 +108,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
         }).collect(Collectors.toList());
 
         pageUtils.setList(blogCommentVos);
+
+        log.info("IP：{}， 查询博客[{}]评论", IPInterceptor.IP_INFO.get(), blog);
         return pageUtils;
     }
 
@@ -124,6 +133,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
         commentVo.setShowChildren(false);
         commentVo.setParentComment(null);
         commentVo.setChildren(Collections.emptyList());
+
+        log.info("IP：{}， 用户[{}]：{}, 发表评论：{}", IPInterceptor.IP_INFO.get(), comment.getUserId(), comment.getNickname(), comment.getContent());
         return commentVo;
     }
 

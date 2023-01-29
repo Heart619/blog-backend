@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.example.blog2.config.OSSConfig;
 import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -38,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author mxp
  */
 
+@Slf4j
 @Service
 public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity> implements PicturesService {
 
@@ -54,6 +57,7 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
                 new QueryWrapper<PicturesEntity>().eq("type", 2)
         );
 
+//        log.info("IP：{}，读取照片墙", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
@@ -97,6 +101,7 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
         }
         picture.setType(-1);
         save(picture);
+        log.info("IP：{}，上传图片", IPInterceptor.IP_INFO.get());
         return ossConfig.getRegion() + "/" + key;
     }
 
@@ -107,6 +112,7 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
 
     @Override
     public List<PicturesEntity> getWallImg() {
+        log.info("IP：{}，读取所有照片", IPInterceptor.IP_INFO.get());
         return list(new QueryWrapper<PicturesEntity>().eq("type", 2));
     }
 
@@ -114,6 +120,7 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
     public void delPic(PicturesEntity pictures) {
         ossUtils.del(pictures.getImage());
         removeById(pictures.getId());
+        log.info("IP：{}，删除照片[{}]", IPInterceptor.IP_INFO.get(), pictures.getType());
     }
 
 }

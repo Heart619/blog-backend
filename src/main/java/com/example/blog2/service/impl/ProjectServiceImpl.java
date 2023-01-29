@@ -1,7 +1,8 @@
 package com.example.blog2.service.impl;
 
-import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.utils.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Map;
@@ -18,6 +19,8 @@ import org.springframework.util.StringUtils;
 /**
  * @author mxp
  */
+
+@Slf4j
 @Service
 public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> implements ProjectService {
 
@@ -38,6 +41,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
                 queryWrapper
         );
 
+        log.info("IP：{}， 分页查询项目信息", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
@@ -47,6 +51,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
         if (!DefaultImgUtils.isDefaultBackImg(project.getPicUrl())) {
             ossUtils.del(project.getPicUrl());
         }
+
         removeById(id);
     }
 

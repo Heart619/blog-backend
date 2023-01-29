@@ -5,6 +5,7 @@ import com.example.blog2.exception.UserNotFoundException;
 import com.example.blog2.exception.UserPasswordErrorException;
 import com.example.blog2.exception.UserExistsNickNameException;
 import com.example.blog2.exception.UserExistsUserNameException;
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.service.CommentService;
 import com.example.blog2.service.MessageService;
 import com.example.blog2.utils.*;
@@ -84,7 +85,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public UserLoginVo login(UserEntity user) throws UserNotFoundException, UserPasswordErrorException {
-        UserEntity u = getOne(new QueryWrapper<UserEntity>().eq("username", user.getUsername()));
+        UserEntity u = getOne(new QueryWrapper<UserEntity>().eq("username", user.getUsername()).last("limit 1"));
         if (u == null) {
             throw new UserNotFoundException();
         }
@@ -107,8 +108,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
             user.setLoginLat(result.getLocation().getLat());
             user.setLoginLng(result.getLocation().getLng());
 
-            log.info("用户 {} 登陆，登陆地点：{}-{}-{}-{}, IP：{}", u.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict(), result.getIp());
-        } catch (Exception e) {}
+            log.info("IP：{}，用户 [{}] 登陆，登陆地点：[{}-{}-{}-{}] ", result.getIp(), u.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
 
         user.setLastLoginTime(new Date());
         user.setId(u.getId());
@@ -156,8 +159,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
             user.setLoginCity(result.getAd_info().getCity());
             user.setLoginLat(result.getLocation().getLat());
             user.setLoginLng(result.getLocation().getLng());
-            log.info("用户 {} 注册成功，登陆地点：{}-{}-{}-{}, IP：{}", user.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict(), result.getIp());
-        } catch (Exception e) {}
+            log.info("IP：{}， 用户 [{}] 注册成功，登陆地点：[{}-{}-{}-{}] ", result.getIp(), user.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
 
         save(user);
         UserLoginVo loginVo = new UserLoginVo();
@@ -167,7 +172,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     private void checkUserNameAndNickName(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException {
-        UserEntity one = getOne(new QueryWrapper<UserEntity>().eq("nickname", user.getNickname()).or().eq("username", user.getUsername()));
+        UserEntity one = getOne(new QueryWrapper<UserEntity>().eq("nickname", user.getNickname()).or().eq("username", user.getUsername()).last("limit 1"));
         if (one == null) {
             return;
         }
@@ -211,6 +216,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         UserLoginVo loginVo = new UserLoginVo();
         loginVo.setUser(user);
         loginVo.setToken(TokenUtil.sign(user));
+
+        log.info("IP：{}， 用户 [{}] 修改密码", IPInterceptor.IP_INFO.get(), user.getNickname());
         return loginVo;
     }
 

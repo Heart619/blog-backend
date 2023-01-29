@@ -4,12 +4,11 @@ import com.example.blog2.config.OSSConfig;
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.entity.PicturesEntity;
 import com.example.blog2.entity.UserEntity;
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.service.UserService;
 import com.example.blog2.service.PicturesService;
-import com.example.blog2.utils.DefaultImgUtils;
-import com.example.blog2.utils.OSSUtils;
-import com.example.blog2.utils.PageUtils;
-import com.example.blog2.utils.Query;
+import com.example.blog2.utils.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author mxp
  */
+
+@Slf4j
 @Service
 public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> implements EssayService {
 
@@ -80,7 +81,7 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
         Map<Long, UserEntity> map = userService.getUserAvatarAndNickName().stream().collect(Collectors.toMap(UserEntity::getId, x -> x));
 
         page.getRecords().forEach(x -> {
-            x.setContent(new String(ossUtils.load(x.getContent()), StandardCharsets.UTF_8));
+            x.setContent(MarkdownUtils.markdownToHtmlExtensions(new String(ossUtils.load(x.getContent()), StandardCharsets.UTF_8)));
             UserEntity user = map.get(x.getAuthor());
             if (user != null) {
                 x.setNickName(user.getNickname());
@@ -90,6 +91,8 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
                 x.setAvatar(DefaultImgUtils.getDefaultAvatarImg());
             }
         });
+
+        log.info("IP：{}， 随笔信息查询", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
@@ -110,17 +113,20 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
             }
             essay.setContent(ossUtils.upload(k, essay.getContent().getBytes(StandardCharsets.UTF_8)));
             this.updateById(essay);
+            log.info("IP：{}，用户[{}], 更新随笔[{}]", IPInterceptor.IP_INFO.get(), essay.getAuthor(), essay.getTitle());
         } else {
             String k = ossConfig.getEssay() + LocalDate.now() + "/" + UUID.randomUUID();
             ossUtils.upload(k, essay.getContent().getBytes(StandardCharsets.UTF_8));
             essay.setCreateTime(new Date());
             essay.setContent(k);
             this.save(essay);
+            log.info("IP：{}，用户[{}], 新增随笔[{}]", IPInterceptor.IP_INFO.get(), essay.getAuthor(), essay.getTitle());
         }
 
         CompletableFuture.runAsync(() -> {
             updatePictureBelongEssay(essay.getId());
         }, executor);
+
     }
 
     /**
@@ -169,6 +175,8 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
                 picturesService.removeByIds(longs);
             }
         }, executor);
+
+        log.info("IP：{}，用户[{}], 新增随笔[{}]", IPInterceptor.IP_INFO.get(), essay.getAuthor(), essay.getTitle());
     }
 
 }

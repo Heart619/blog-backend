@@ -1,11 +1,11 @@
 package com.example.blog2.service.impl;
 
-import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.BlogDao;
 import com.example.blog2.entity.BlogEntity;
-import com.example.blog2.entity.TagEntity;
+import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.service.TypeService;
 import com.example.blog2.utils.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 /**
  * @author mxp
  */
+@Slf4j
 @Service
 public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements TypeService {
 
@@ -46,6 +47,8 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
                 queryWrapper
         );
         setBlogNum(page.getRecords());
+
+//        log.info("IP：{}， 分页查询分类", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
@@ -53,6 +56,8 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
     public List<TypeEntity> getAllType() {
         List<TypeEntity> list = list();
         setBlogNum(list);
+
+//        log.info("IP：{}， 查询所有分类信息", IPInterceptor.IP_INFO.get());
         return list;
     }
 
@@ -66,6 +71,7 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
             typeEntity.setPicUrl(DefaultImgUtils.getDefaultBackImg());
         }
         save(typeEntity);
+        log.info("IP：{}， 添加分类[{}]", IPInterceptor.IP_INFO.get(), typeEntity.getName());
         return typeEntity;
     }
 
@@ -75,6 +81,7 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
             throw new RuntimeException("分类名称重复");
         }
         updateById(type);
+        log.info("IP：{}， 更新分类", IPInterceptor.IP_INFO.get());
         return type;
     }
 
@@ -91,6 +98,7 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
         }
         removeById(id);
 
+        log.info("IP：{}， 删除分类", IPInterceptor.IP_INFO.get());
         return true;
     }
 
@@ -102,7 +110,7 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
     }
 
     private boolean existsName(String name) {
-        TypeEntity entity = getOne(new QueryWrapper<TypeEntity>().eq("name", name));
+        TypeEntity entity = getOne(new QueryWrapper<TypeEntity>().eq("name", name).last("limit 1"));
         return entity != null;
     }
 

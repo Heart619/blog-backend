@@ -23,9 +23,16 @@ public class IPInterceptor implements HandlerInterceptor {
             // 添加要加入黑名单的ip
     ));
 
+    public static final ThreadLocal<String> IP_INFO = new ThreadLocal<>();
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        return !blackIP.contains(getIpAddress(request));
+        String ipAddress = getIpAddress(request);
+        if (blackIP.contains(ipAddress)) {
+            return false;
+        }
+        IP_INFO.set(ipAddress);
+        return true;
     }
 
     private String getIpAddress(HttpServletRequest request) {
