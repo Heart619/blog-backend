@@ -1,6 +1,5 @@
 package com.example.blog2.utils;
 
-import com.example.blog2.constant.ConstantImg;
 import org.springframework.util.StringUtils;
 
 /**

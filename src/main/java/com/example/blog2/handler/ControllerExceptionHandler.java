@@ -28,6 +28,7 @@ public class ControllerExceptionHandler {
             throw e;
         }
         log.error("IP : {}, Request URL : {}, Exception : {}", IPInterceptor.IP_INFO.get(), request.getRequestURL(), e.getMessage());
+        e.printStackTrace();
         if (!StringUtils.isEmpty(e.getMessage())) {
             return R.error(e.getMessage());
         }

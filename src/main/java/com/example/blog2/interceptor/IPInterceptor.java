@@ -3,6 +3,7 @@ package com.example.blog2.interceptor;
 import com.example.blog2.utils.IPUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,5 +32,18 @@ public class IPInterceptor implements HandlerInterceptor {
         }
         IP_INFO.set(ipAddress);
         return true;
+    }
+
+    /**
+     * 视图渲染完成调用
+     * @param request
+     * @param response
+     * @param handler
+     * @param ex
+     * @throws Exception
+     */
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        IP_INFO.remove();
     }
 }

@@ -28,24 +28,32 @@ public class UserWebController {
     private UserService userService;
 
     @PostMapping("/login")
-    public R login(@RequestBody UserRecVo user) {
+    public R login(@RequestBody UserRecVo user) throws Exception {
         try {
             return R.ok("登陆成功").put("data", userService.login(user));
-        } catch (UserNotFoundException e) {
-            return R.error(ConstantUser.LOGIN_FAIL_NOT_FOUND);
-        } catch (UserPasswordErrorException e) {
-            return R.error(ConstantUser.LOGIN_FAIL_ERROR);
+        } catch (Exception e) {
+            if (e instanceof UserNotFoundException) {
+                return R.error(ConstantUser.LOGIN_FAIL_NOT_FOUND);
+            } else if (e instanceof UserPasswordErrorException) {
+                return R.error(ConstantUser.LOGIN_FAIL_ERROR);
+            } else {
+                throw e;
+            }
         }
     }
 
     @PostMapping("/register")
-    public R register(@RequestBody UserRecVo user) {
+    public R register(@RequestBody UserRecVo user) throws Exception {
         try {
             return R.ok().put("data", userService.register(user));
-        } catch (UserExistsUserNameException e) {
-            return R.error(ConstantUser.REGISTER_FAIL_EXISTS_USER_NAME);
-        } catch (UserExistsNickNameException e) {
-            return R.error(ConstantUser.REGISTER_FAIL_EXISTS_NICK_NAME);
+        } catch (Exception e) {
+            if (e instanceof UserExistsUserNameException) {
+                return R.error(ConstantUser.REGISTER_FAIL_EXISTS_USER_NAME);
+            } else if (e instanceof UserExistsNickNameException) {
+                return R.error(ConstantUser.REGISTER_FAIL_EXISTS_NICK_NAME);
+            } else {
+                throw e;
+            }
         }
     }
 }

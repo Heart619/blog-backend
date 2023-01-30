@@ -1,11 +1,9 @@
 package com.example.blog2.service.impl;
 
 import com.example.blog2.config.TencentServerConfig;
-import com.example.blog2.exception.UserNotFoundException;
-import com.example.blog2.exception.UserPasswordErrorException;
-import com.example.blog2.exception.UserExistsNickNameException;
-import com.example.blog2.exception.UserExistsUserNameException;
+import com.example.blog2.exception.*;
 import com.example.blog2.interceptor.IPInterceptor;
+import com.example.blog2.interceptor.TokenInterceptor;
 import com.example.blog2.service.CommentService;
 import com.example.blog2.service.MessageService;
 import com.example.blog2.utils.*;
@@ -16,6 +14,7 @@ import com.example.blog2.vo.UserRecVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
@@ -83,42 +82,29 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
-    public UserLoginVo login(UserRecVo vo) throws UserNotFoundException, UserPasswordErrorException {
-
-//        try {
-//            RSAUtil.generateKeyPair().setPrivateKeyString(Base64.getEncoder().encodeToString(RSAUtil.getPrivateKey().getEncoded()));
-//            System.out.println(RSAUtil.decrypt(user.getPassword()));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public UserLoginVo login(UserRecVo vo) throws Exception {
         UserEntity u = getOne(new QueryWrapper<UserEntity>().eq("username", vo.getUsername()).last("limit 1"));
         if (u == null) {
             throw new UserNotFoundException();
         }
-        if (!u.getPassword().equals(vo.getPassword())) {
+
+        String password = vo.getPassword();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (!passwordEncoder.matches(RSAUtil.decrypt(password), u.getPassword())) {
             throw new UserPasswordErrorException();
         }
 
         String ip = IPInterceptor.IP_INFO.get();
-        UserLocationVo locationVo;
-        if ("127.0.0.1".equals(ip)) {
+        UserLocationVo locationVo = getUserLocation(ip);
+        if (locationVo.getResult() == null && locationVo.getStatus().equals(375)) {
             locationVo = getUserLocation(null);
-        } else {
-            locationVo = getUserLocation(ip);
         }
         UserEntity user = new UserEntity();
-        try {
-            UserLocationVo.Result result = locationVo.getResult();
-            user.setLoginProvince(result.getAd_info().getProvince());
-            user.setLoginCity(result.getAd_info().getCity());
-            user.setLoginLat(result.getLocation().getLat());
-            user.setLoginLng(result.getLocation().getLng());
-
-            log.info("IP：{}，用户 [{}] 登陆，登陆地点：[{}-{}-{}-{}] ", result.getIp(), u.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict());
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-
+        UserLocationVo.Result result = locationVo.getResult();
+        user.setLoginProvince(result.getAd_info().getProvince());
+        user.setLoginCity(result.getAd_info().getCity());
+        user.setLoginLat(result.getLocation().getLat());
+        user.setLoginLng(result.getLocation().getLng());
         user.setLastLoginTime(new Date());
         user.setId(u.getId());
         updateById(user);
@@ -132,11 +118,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         UserLoginVo userLoginVo = new UserLoginVo();
         userLoginVo.setToken(TokenUtil.sign(u));
         userLoginVo.setUser(u);
+
+        log.info("IP：{}，用户 [{}] 登陆，登陆地点：[{}-{}-{}-{}] ", result.getIp(), u.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict());
         return userLoginVo;
     }
 
     @Override
-    public UserLoginVo register(UserRecVo u) throws UserExistsNickNameException, UserExistsUserNameException {
+    public UserLoginVo register(UserRecVo u) throws Exception {
 
         try {
             checkUserNameAndNickName(u);
@@ -153,25 +141,21 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         }
 
         String ip = IPInterceptor.IP_INFO.get();
-        UserLocationVo locationVo;
-        if ("127.0.0.1".equals(ip)) {
+        UserLocationVo locationVo = getUserLocation(ip);
+        if (locationVo.getResult() == null && locationVo.getStatus().equals(375)) {
             locationVo = getUserLocation(null);
-        } else {
-            locationVo = getUserLocation(ip);
         }
-
-        try {
-            UserLocationVo.Result result = locationVo.getResult();
-            user.setLoginProvince(result.getAd_info().getProvince());
-            user.setLoginCity(result.getAd_info().getCity());
-            user.setLoginLat(result.getLocation().getLat());
-            user.setLoginLng(result.getLocation().getLng());
-            log.info("IP：{}， 用户 [{}] 注册成功，登陆地点：[{}-{}-{}-{}] ", result.getIp(), user.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict());
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-
+        UserLocationVo.Result result = locationVo.getResult();
+        user.setLoginProvince(result.getAd_info().getProvince());
+        user.setLoginCity(result.getAd_info().getCity());
+        user.setLoginLat(result.getLocation().getLat());
+        user.setLoginLng(result.getLocation().getLng());
+        String decrypt = RSAUtil.decrypt(user.getPassword());
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        user.setPassword(passwordEncoder.encode(decrypt));
+        user.setType(0);
         save(user);
+        log.info("IP：{}， 用户 [{}] 注册成功，登陆地点：[{}-{}-{}-{}] ", result.getIp(), user.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict());
         UserLoginVo loginVo = new UserLoginVo();
         loginVo.setToken(TokenUtil.sign(user));
         loginVo.setUser(user);
@@ -196,6 +180,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public UserEntity setAvatar(UserEntity user) {
+
+        if (!TokenUtil.checkCurUserStatus(user.getId())) {
+            throw new UserStatusException();
+        }
+
         UserEntity userEntity = getById(user.getId());
         String avatar = userEntity.getAvatar();
         if (!DefaultImgUtils.isDefaultAvatarImg(avatar)) {
@@ -212,10 +201,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
-    public UserLoginVo updatePwd(PasswordUpdateVo vo) {
+    public UserLoginVo updatePwd(PasswordUpdateVo vo) throws Exception {
+
+        if (!TokenUtil.checkCurUserStatus(vo.getId())) {
+            throw new UserStatusException();
+        }
+
         UserEntity userEntity = new UserEntity();
         userEntity.setId(vo.getId());
-        userEntity.setPassword(vo.getNewPwd());
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        userEntity.setPassword(passwordEncoder.encode(RSAUtil.decrypt(vo.getNewPwd())));
         userEntity.setUpdateTime(new Date());
         updateById(userEntity);
 
@@ -230,6 +225,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public void removeUser(Long id) {
+
+        if (!TokenUtil.checkCurUserStatus(id)) {
+            throw new UserStatusException();
+        }
+
         UserEntity user = getById(id);
         removeById(user);
 
@@ -252,6 +252,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public void updateUser(UserRecVo user) throws UserExistsNickNameException, UserExistsUserNameException {
+        if (!TokenUtil.checkCurUserStatus(user.getId())) {
+            throw new UserStatusException();
+        }
 
         try {
             checkUserNameAndNickName(user);

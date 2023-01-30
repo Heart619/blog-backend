@@ -14,12 +14,14 @@ import java.util.Date;
  */
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.blog2.exception.UserStatusException;
+import com.example.blog2.interceptor.TokenInterceptor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TokenUtil {
 
-    private static final long EXPIRE_TIME= 10 * 60 * 60 * 1000;
+    private static final long EXPIRE_TIME = 10 * 60 * 60 * 1000;
 
 //    //密钥盐
 //    private static final String TOKEN_SECRET = "QIUQIULEXIANGQUDACHANG";
@@ -35,7 +37,7 @@ public class TokenUtil {
             Date expiresAt = new Date(System.currentTimeMillis() + EXPIRE_TIME);
             token = JWT.create()
                     .withIssuer("auth0")
-                    .withClaim("userId", user.getId().toString())
+                    .withClaim("userId", user.getId())
                     .withClaim("userType", user.getType())
                     .withExpiresAt(expiresAt)
                     // 使用了HMAC256加密算法。
@@ -73,7 +75,7 @@ public class TokenUtil {
      * @param token
      * @return
      */
-    public static boolean adminVerify(String token) {
+    public static TokenInterceptor.UserTokenInfo adminVerify(String token) {
         try {
             JWTVerifier verifier = JWT
                     .require(Algorithm.RSA256(RSAUtil.getPublicKey(), RSAUtil.getPrivateKey()))
@@ -82,9 +84,12 @@ public class TokenUtil {
 
             DecodedJWT jwt = verifier.verify(token);
             if (jwt.getClaim("userType").asInt() > 0){
-                return true;
+                TokenInterceptor.UserTokenInfo tokenInfo = new TokenInterceptor.UserTokenInfo();
+                tokenInfo.setId(jwt.getClaim("userId").asLong());
+                tokenInfo.setType(jwt.getClaim("userType").asInt());
+                return tokenInfo;
             }
-            return false;
+            return null;
         } catch (TokenExpiredException e){
             throw new TokenExpiredException("用户登陆过期，请重新登陆");
         } catch (Exception e) {
@@ -92,4 +97,15 @@ public class TokenUtil {
         }
     }
 
+    public static boolean checkCurUserStatus(Long id) {
+        return TokenInterceptor.CUR_USER_INFO.get().getId().equals(id) || TokenInterceptor.CUR_USER_INFO.get().getType().compareTo(2) == 0;
+    }
+
+    public static boolean checkUserType() {
+        return TokenInterceptor.CUR_USER_INFO.get().getType().compareTo(1) >= 0;
+    }
+
+    public static boolean checkRootType() {
+        return TokenInterceptor.CUR_USER_INFO.get().getType().compareTo(1) > 0;
+    }
 }

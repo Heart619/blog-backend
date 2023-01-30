@@ -1,9 +1,6 @@
 package com.example.blog2.vo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * @author mxp

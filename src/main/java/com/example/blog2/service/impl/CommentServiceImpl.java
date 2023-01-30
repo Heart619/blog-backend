@@ -3,10 +3,12 @@ package com.example.blog2.service.impl;
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.BlogDao;
 import com.example.blog2.entity.BlogEntity;
+import com.example.blog2.exception.UserStatusException;
 import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.utils.DefaultImgUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
+import com.example.blog2.utils.TokenUtil;
 import com.example.blog2.vo.BlogCommentVo;
 import com.example.blog2.vo.DateCountVo;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +66,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
 
     @Override
     public void delComment(Long id) {
+        CommentEntity comment = getById(id);
+        if (!TokenUtil.checkCurUserStatus(comment.getUserId())) {
+            throw new UserStatusException();
+        }
+
         delChildrenComment(id);
         removeById(id);
         log.info("IP：{}， 删除评论", IPInterceptor.IP_INFO.get());

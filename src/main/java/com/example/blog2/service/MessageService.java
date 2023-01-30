@@ -35,5 +35,11 @@ public interface MessageService extends IService<MessageEntity> {
      * @param message
      */
     void saveMessage(MessageEntity message);
+
+    /**
+     * 删除随笔
+     * @param id
+     */
+    void removeMsg(Long id);
 }
 

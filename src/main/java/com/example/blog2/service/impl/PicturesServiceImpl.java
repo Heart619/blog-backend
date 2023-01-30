@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.example.blog2.config.OSSConfig;
 import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.exception.UserStatusException;
 import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.utils.OSSUtils;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.Query;
+import com.example.blog2.utils.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -63,6 +65,10 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
 
     @Override
     public String upload(MultipartFile file) throws IOException {
+        if (!TokenUtil.checkUserType()) {
+            throw new UserStatusException();
+        }
+
         byte[] bytes = file.getBytes();
         String key = LocalDate.now() + "/" + UUID.randomUUID() + file.getOriginalFilename();
         ossUtils.upload(key, bytes);
@@ -118,6 +124,10 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
 
     @Override
     public void delPic(PicturesEntity pictures) {
+        if (!TokenUtil.checkUserType()) {
+            throw new UserStatusException();
+        }
+
         ossUtils.del(pictures.getImage());
         removeById(pictures.getId());
         log.info("IP：{}，删除照片[{}]", IPInterceptor.IP_INFO.get(), pictures.getType());

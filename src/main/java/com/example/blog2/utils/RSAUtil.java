@@ -1,6 +1,8 @@
 package com.example.blog2.utils;
 
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
 import java.nio.charset.StandardCharsets;
@@ -18,14 +20,20 @@ import java.security.spec.X509EncodedKeySpec;
  *
  * @author mxp
  */
+@Component
 public class RSAUtil {
 
-	private static final String PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAogfO/bveLnn0Tb7dnxIVXj25KjTmVFBllP0zqYY3FwNVKQ03iKI7kYd01sbnlRHLVcu74nmk41Ux7mHPQx5nghyktLiyovsbwBkqpWNnfmT9DNq89R6Lw9Mrw/L0pJDc9ACGkksGDyFvQjEt/3+h/phMjEkgHU2kA+F0ZCCgZgVOsKQXwL452+NpLH4rekwfXRJw0GCaZeyMPkNYbItsHvCD1CCPYeCJQw9sfYX/TKeDO2LGZKH5xCi672SqAeu36fpUsw4LXAosTln9Xwpvd2+JT3+GOzKhv05j45YtY96L4/zho0FGn7YSPAd+o3JGMg6B0Cb1unnp6PMKwEBMewIDAQAB";
+	private static String PUBLIC_KEY;
+	private static String PRIVATE_KEY;
 
-	private static final String PRIVATE_KEY = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCiB879u94uefRNvt2fEhVePbkqNOZUUGWU/TOphjcXA1UpDTeIojuRh3TWxueVEctVy7vieaTjVTHuYc9DHmeCHKS0uLKi+xvAGSqlY2d+ZP0M2rz1HovD0yvD8vSkkNz0AIaSSwYPIW9CMS3/f6H+mEyMSSAdTaQD4XRkIKBmBU6wpBfAvjnb42ksfit6TB9dEnDQYJpl7Iw+Q1hsi2we8IPUII9h4IlDD2x9hf9Mp4M7YsZkofnEKLrvZKoB67fp+lSzDgtcCixOWf1fCm93b4lPf4Y7MqG/TmPjli1j3ovj/OGjQUafthI8B36jckYyDoHQJvW6eeno8wrAQEx7AgMBAAECggEAZYobL2tCK0IF1Yrc+8irV2m61jZceU4AusOKUpxnfaZ7AcTknl18kxCeKdJwYjzKfjO0xJKSwFwtdEQbTOaK20Dz/sUYPYa7t0CONyL6Qn0rD5ksfTftQoTdkmh444Bc1xRVQOx/GZBMVuDXAJyNei0bG3bgBz0Woc/xzqWbnxKDaqpS4d+LmdjSss4Q3HQ6L2uh0b3RaUyQ5HPSGTzoo8eA3iRAvxYW7dtgf2LoDztZ2Uv9HCL8v0/MnvVnRbOPPI5BwEr2dItGL5uj2BTrjvpCcd352WUlu4mMjdADywGDgyAn4GaPI9+G6rdplwVyO5nmVoMPjtd50Ul2mVm+AQKBgQD7hkcWd5thFlFYi0gUpUIs3hheaqKTm+mK4+RQxlGTg695fFs93L6Way98x9UiG86Oa2pCaMo0TZTdsSVqV8x/dCob+ElBcr5hM6zJhE3iuCH9mEw2DxDAFmyut5OqO/M3f4f1EWMuntgNQ7pI73A4UdPEvbhq4Kxb7RSn+QdmgQKBgQCk6eAn1+makU7quKsjscOoMp7b7DIrfv0FKVLPK1y0CbGvELExItqT4tfn3RBZO1kUmRTpaRx+ZvQhkULv9Y07U6iDiaicFmOf87t0iFDKm1aQCmyfoB1ZXxWXwUFlWsZGo0pB5lAj7mAQswxLcSsmBFtJ/bD2rKFbUK7TqFDM+wKBgQCYNwncSePpXGU8LYYgoGYs2vdqZCQhKlCqcgHg9DO4DxBpd92L0YQxaYpifFi6fJODUvQKXnpILs8xXpwjACFM3JMDPD2w8uzNzET76yprUz2Wx80PRgzAApIhJg2iDwfAhVhU8gHQ2+YqGNuqeeSy4KpEvP/XBkKomxBOGwHkgQKBgCpVv616yAVd+BxZe9WV9Nxg4lcis15nIx0IFrIIN6wgMPT4HAS5JdOBEFv9bAz8J0oaYjvpN99bHqDfYYeoSbFJMKFT3Wz0cm7FawHnXJYmenpPssLnn6Epv6lNezRBsVTA5nc0YK5Yq2CeFjHnw2PnCmhcL+mjN2jxtW+wbc2xAoGBAMBpqCHH3nyH+ckyPIao/gKkA/PFb4ur2e9JfhjEfpne80zwD5p6Md1Hm01j7vMu/uM+LhOq/J6w76eb1DRu4nzCngTS23/RErXZwvMCqkMe/GqM3gEvmqJqDX10r3RY86NM9tNSiX5ntgW+pyBLOxMJHwGG2+5xJ8nu7uGnl5K6";
+	@Value("${rsa.publicKey}")
+	public void setPublicKey(String publicKey) {
+		PUBLIC_KEY = publicKey;
+	}
 
-	public static String getPublicKeyStr(){
-		return PUBLIC_KEY;
+	@Value("${rsa.privateKey}")
+	public void setPrivateKey(String privateKey) {
+		PRIVATE_KEY = privateKey;
 	}
 
 	public static RSAPublicKey getPublicKey() throws Exception {

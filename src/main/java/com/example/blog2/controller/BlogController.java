@@ -62,16 +62,6 @@ public class BlogController {
         return R.ok();
     }
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		blogService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
-
     @PostMapping("/{id}/delete")
     public R delBlog(@PathVariable("id") Long id) throws ExecutionException, InterruptedException {
         blogService.delBlog(id);

@@ -4,6 +4,7 @@ import com.example.blog2.config.OSSConfig;
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.entity.PicturesEntity;
 import com.example.blog2.entity.UserEntity;
+import com.example.blog2.exception.UserStatusException;
 import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.service.UserService;
 import com.example.blog2.service.PicturesService;
@@ -107,6 +108,10 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
 
 
         if (old != null) {
+            if (!TokenUtil.checkCurUserStatus(essay.getAuthor())) {
+                throw new UserStatusException();
+            }
+
             String k = old.getContent();
             ossUtils.del(k);
             String[] split = k.split("/");
@@ -117,6 +122,10 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
             this.updateById(essay);
             log.info("IP：{}，用户[{}], 更新随笔[{}]", IPInterceptor.IP_INFO.get(), essay.getAuthor(), essay.getTitle());
         } else {
+            if (!TokenUtil.checkUserType()) {
+                throw new UserStatusException();
+            }
+
             String k = ossConfig.getEssay() + LocalDate.now() + "/" + UUID.randomUUID();
             ossUtils.upload(k, essay.getContent().getBytes(StandardCharsets.UTF_8));
             essay.setCreateTime(new Date());
@@ -159,6 +168,10 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
     @Override
     public void delEssayById(Long id) {
         EssayEntity essay = getById(id);
+        if (!TokenUtil.checkCurUserStatus(essay.getAuthor())) {
+            throw new UserStatusException();
+        }
+
         removeById(id);
 
         CompletableFuture.runAsync(() -> {

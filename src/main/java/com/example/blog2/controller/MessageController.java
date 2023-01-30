@@ -6,6 +6,7 @@ import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
+import com.example.blog2.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,19 +47,9 @@ public class MessageController {
         return R.ok();
     }
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		messageService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
-
     @PostMapping("/messages/del/{id}")
     public R delMsg(@PathVariable("id") Long id) {
-        messageService.removeById(id);
+        messageService.removeMsg(id);
         return R.ok("留言删除成功成功").put("data", messageService.list(new QueryWrapper<MessageEntity>().orderByDesc("create_time")));
     }
 }

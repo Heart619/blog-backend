@@ -55,16 +55,6 @@ public class UserController {
     }
 
     /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    public R save(@RequestBody UserEntity user){
-		userService.save(user);
-
-        return R.ok().put("data", user);
-    }
-
-    /**
      * 修改
      */
     @RequestMapping("/update")
@@ -77,16 +67,6 @@ public class UserController {
         } catch (UserExistsUserNameException e) {
             return R.error(ConstantUser.EXISTS_USER_NAME);
         }
-    }
-
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		userService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
     }
 
     @PostMapping("/del/{id}")
@@ -103,12 +83,12 @@ public class UserController {
 
     @PostMapping("/setAvatar")
     public R setAvatar(@RequestBody UserEntity user) {
-        UserEntity u =userService.setAvatar(user);
+        UserEntity u = userService.setAvatar(user);
         return R.ok().put("data", u);
     }
 
     @PostMapping("/updatePwd")
-    public R updatePwd(@RequestBody PasswordUpdateVo vo) {
+    public R updatePwd(@RequestBody PasswordUpdateVo vo) throws Exception {
         return R.ok().put("data", userService.updatePwd(vo));
     }
 }

@@ -35,7 +35,7 @@ public interface UserService extends IService<UserEntity> {
      * @throws UserNotFoundException
      * @throws UserPasswordErrorException
      */
-    UserLoginVo login(UserRecVo user) throws UserNotFoundException, UserPasswordErrorException;
+    UserLoginVo login(UserRecVo user) throws Exception;
 
     /**
      * 注册
@@ -44,7 +44,7 @@ public interface UserService extends IService<UserEntity> {
      * @throws UserExistsNickNameException
      * @throws UserExistsUserNameException
      */
-    UserLoginVo register(UserRecVo user) throws UserExistsNickNameException, UserExistsUserNameException;
+    UserLoginVo register(UserRecVo user) throws Exception;
 
     /**
      * 修改头像
@@ -63,7 +63,7 @@ public interface UserService extends IService<UserEntity> {
      * 修改密码
      * @param vo
      */
-    UserLoginVo updatePwd(PasswordUpdateVo vo);
+    UserLoginVo updatePwd(PasswordUpdateVo vo) throws Exception;
 
     /**
      * 删除用户

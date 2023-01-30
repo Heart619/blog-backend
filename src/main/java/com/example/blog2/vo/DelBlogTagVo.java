@@ -10,5 +10,6 @@ import lombok.Data;
 public class DelBlogTagVo {
 
     private Long id;
+    private Long userId;
     private Long tagId;
 }

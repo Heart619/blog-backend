@@ -49,15 +49,6 @@ public class TagController {
         return R.ok("修改成功").put("data", tagEntity);
     }
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-        tagService.removeByIds(Arrays.asList(ids));
-        return R.ok("删除成功");
-    }
-
     @PostMapping("/{id}/delete")
     public R delete(@PathVariable Long id) {
         boolean res = tagService.delTag(id);

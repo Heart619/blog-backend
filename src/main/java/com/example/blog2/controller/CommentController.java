@@ -58,16 +58,6 @@ public class CommentController {
         return R.ok();
     }
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		commentService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
-
     @PostMapping("/{id}/delete")
     public R delete(@PathVariable Long id) {
         commentService.delComment(id);

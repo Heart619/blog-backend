@@ -4,6 +4,7 @@ import com.example.blog2.config.OSSConfig;
 import com.example.blog2.constant.ConstantImg;
 import com.example.blog2.dao.UserDao;
 import com.example.blog2.entity.*;
+import com.example.blog2.exception.UserStatusException;
 import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.service.*;
 import com.example.blog2.utils.*;
@@ -277,25 +278,28 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 
     @Override
     public void delBlog(Long id) {
-        String ip = IPInterceptor.IP_INFO.get();
+        BlogEntity blog = getById(id);
+        if (!TokenUtil.checkCurUserStatus(blog.getUserId())) {
+            throw new UserStatusException();
+        }
+
         CompletableFuture.runAsync(() -> {
             // 删除博客内容
-            BlogEntity blog = getById(id);
             String img = blog.getFirstPicture();
             if (!DefaultImgUtils.isDefaultBackImg(img)) {
                 ossUtils.del(img);
             }
             ossUtils.del(blog.getContent());
-            log.info("IP：{}， 删除博客[{}]", ip, blog.getTitle());
         }, executor);
 
         // 删除博客图片
         CompletableFuture.runAsync(() -> {
             List<PicturesEntity> entityList = picturesService.list(new QueryWrapper<PicturesEntity>().eq("belong", id).eq("type", true));
-            entityList.forEach(x -> {
+            List<Long> ids = entityList.stream().map(x -> {
                 ossUtils.del(x.getImage());
-            });
-            picturesService.removeByIds(entityList);
+                return x.getId();
+            }).collect(Collectors.toList());
+            picturesService.removeByIds(ids);
         }, executor);
 
         // 删除博客标签对应关系
@@ -309,10 +313,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
         }, executor);
 
         removeById(id);
+        log.info("IP：{}， 删除博客[{}]", IPInterceptor.IP_INFO.get(), blog.getTitle());
     }
 
     @Override
     public void updateImg(BlogEntity blog) {
+        if (!TokenUtil.checkCurUserStatus(blog.getUserId())) {
+            throw new UserStatusException();
+        }
+
         BlogEntity entity = getById(blog.getId());
         if (!DefaultImgUtils.isDefaultBackImg(entity.getFirstPicture())) {
             ossUtils.del(entity.getFirstPicture());
@@ -331,6 +340,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 
     @Override
     public void updateBlog(BlogEntity blog) {
+        if (!TokenUtil.checkCurUserStatus(blog.getUserId())) {
+            throw new UserStatusException();
+        }
+
         BlogEntity old = getById(blog.getId());
         String key = old.getContent();
         if (!StringUtils.isEmpty(key)) {
@@ -343,7 +356,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
         }
         blog.setContent(ossUtils.upload(key, blog.getContent().getBytes(StandardCharsets.UTF_8)));
 
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         CompletableFuture.runAsync(() -> {
+            RequestContextHolder.setRequestAttributes(requestAttributes);
             updatePictureBelongBlog(blog.getId());
         }, executor);
 
@@ -354,6 +369,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 
     @Override
     public boolean addBlog(BlogEntity blog) throws ExecutionException, InterruptedException {
+        if (!TokenUtil.checkUserType()) {
+            throw new UserStatusException();
+        }
+
         CompletableFuture<Long> saveFuture = CompletableFuture.supplyAsync(() -> {
             blog.setCreateTime(new Date());
             blog.setUpdateTime(new Date());
@@ -398,17 +417,28 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 
     @Override
     public void updateType(BlogEntity blog) {
+        if (!TokenUtil.checkCurUserStatus(blog.getUserId())) {
+            throw new UserStatusException();
+        }
+
         blog.setUpdateTime(new Date());
         updateById(blog);
     }
 
     @Override
     public void delTag(DelBlogTagVo vo) {
+        if (!TokenUtil.checkCurUserStatus(vo.getUserId())) {
+            throw new UserStatusException();
+        }
         blogTagsService.remove(new QueryWrapper<BlogTagsEntity>().eq("blogs_id", vo.getId()).eq("tags_id", vo.getTagId()));
     }
 
     @Override
     public TagEntity createTag(Long id, String name) {
+        if (!TokenUtil.checkUserType()) {
+            throw new UserStatusException();
+        }
+
         TagEntity tag = new TagEntity();
         tag.setName(name);
         tagService.save(tag);

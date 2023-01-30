@@ -1,6 +1,8 @@
 package com.example.blog2.service.impl;
 
+import com.example.blog2.exception.UserStatusException;
 import com.example.blog2.interceptor.IPInterceptor;
+import com.example.blog2.interceptor.TokenInterceptor;
 import com.example.blog2.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
 
     @Override
     public void removeProject(Long id) {
+        if (!TokenUtil.checkRootType()) {
+            throw new UserStatusException();
+        }
+
         ProjectEntity project = getById(id);
         if (!DefaultImgUtils.isDefaultBackImg(project.getPicUrl())) {
             ossUtils.del(project.getPicUrl());
@@ -57,6 +63,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
 
     @Override
     public void updateProject(ProjectEntity project) {
+        if (!TokenUtil.checkRootType()) {
+            throw new UserStatusException();
+        }
+
         if (!StringUtils.isEmpty(project.getPicUrl())) {
             ProjectEntity old = getById(project.getId());
             ossUtils.del(old.getPicUrl());
@@ -68,6 +78,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
 
     @Override
     public void addProject(ProjectEntity project) {
+        if (!TokenUtil.checkRootType()) {
+            throw new UserStatusException();
+        }
+
         if (StringUtils.isEmpty(project.getPicUrl())) {
             project.setPicUrl(DefaultImgUtils.getDefaultBackImg());
         }

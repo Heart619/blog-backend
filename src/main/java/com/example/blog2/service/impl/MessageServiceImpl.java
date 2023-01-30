@@ -1,11 +1,9 @@
 package com.example.blog2.service.impl;
 
 import com.example.blog2.constant.ConstantImg;
+import com.example.blog2.exception.UserStatusException;
 import com.example.blog2.interceptor.IPInterceptor;
-import com.example.blog2.utils.Constant;
-import com.example.blog2.utils.DefaultImgUtils;
-import com.example.blog2.utils.PageUtils;
-import com.example.blog2.utils.Query;
+import com.example.blog2.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.Map;
@@ -51,6 +49,16 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, MessageEntity> i
     public void saveMessage(MessageEntity message) {
         save(message);
         log.info("IP：{}， 用户[{}] - {}， 新增留言：[{}]", IPInterceptor.IP_INFO.get(), message.getUserId(), message.getNickname(), message.getContent());
+    }
+
+    @Override
+    public void removeMsg(Long id) {
+        MessageEntity message = getById(id);
+        if (!TokenUtil.checkCurUserStatus(message.getUserId())) {
+            throw new UserStatusException();
+        }
+
+        removeById(id);
     }
 
 }

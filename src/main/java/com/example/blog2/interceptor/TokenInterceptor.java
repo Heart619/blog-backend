@@ -2,6 +2,8 @@ package com.example.blog2.interceptor;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog2.utils.TokenUtil;
+import com.example.blog2.vo.UserRecVo;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,8 @@ import java.util.Set;
 @Component
 public class TokenInterceptor implements HandlerInterceptor {
 
+    public static final ThreadLocal<UserTokenInfo> CUR_USER_INFO =  new ThreadLocal<>();
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)throws Exception{
         if("OPTIONS".equals(request.getMethod())){
@@ -35,12 +39,18 @@ public class TokenInterceptor implements HandlerInterceptor {
         }
         response.setCharacterEncoding("UTF-8");
         String token = request.getHeader("token");
-//        去掉前端返回的token前后的双引号
-        token = token.substring(1, token.length() - 1);
+
         if(!StringUtils.isEmpty(token)){
+//        去掉前端返回的token前后的双引号
+            token = token.substring(1, token.length() - 1);
             boolean result;
             try {
-                result = TokenUtil.adminVerify(token);
+                UserTokenInfo userTokenInfo = TokenUtil.adminVerify(token);
+                if (userTokenInfo == null) {
+                    return false;
+                }
+                CUR_USER_INFO.set(userTokenInfo);
+                return true;
             } catch (Exception  e) {
                 JSONObject json = new JSONObject();
                 json.put("msg", e.getMessage());
@@ -48,16 +58,12 @@ public class TokenInterceptor implements HandlerInterceptor {
                 response.getWriter().append(json.toJSONString());
                 return false;
             }
-
-            if(result){
-                return true;
-            }
         }
 
         response.setContentType("application/json; charset=utf-8");
         try{
             JSONObject json = new JSONObject();
-            json.put("msg", "token verify fail");
+            json.put("msg", "身份认证失败！");
             json.put("code", HttpStatus.UNAUTHORIZED.value());
             response.getWriter().append(json.toJSONString());
             log.error("认证失败，未通过拦截器, IP:{}", request.getRemoteAddr());
@@ -65,5 +71,16 @@ public class TokenInterceptor implements HandlerInterceptor {
         } catch (Exception e){
             return false;
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        CUR_USER_INFO.remove();
+    }
+
+    @Data
+    public static class UserTokenInfo {
+        private Long id;
+        private Integer type;
     }
 }
