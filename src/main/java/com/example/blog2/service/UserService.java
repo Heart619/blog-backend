@@ -9,6 +9,7 @@ import com.example.blog2.exception.UserPasswordErrorException;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.vo.PasswordUpdateVo;
 import com.example.blog2.vo.UserLoginVo;
+import com.example.blog2.vo.UserRecVo;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public interface UserService extends IService<UserEntity> {
      * @throws UserNotFoundException
      * @throws UserPasswordErrorException
      */
-    UserLoginVo login(UserEntity user) throws UserNotFoundException, UserPasswordErrorException;
+    UserLoginVo login(UserRecVo user) throws UserNotFoundException, UserPasswordErrorException;
 
     /**
      * 注册
@@ -43,7 +44,7 @@ public interface UserService extends IService<UserEntity> {
      * @throws UserExistsNickNameException
      * @throws UserExistsUserNameException
      */
-    UserLoginVo register(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException;
+    UserLoginVo register(UserRecVo user) throws UserExistsNickNameException, UserExistsUserNameException;
 
     /**
      * 修改头像
@@ -76,6 +77,6 @@ public interface UserService extends IService<UserEntity> {
      * @throws UserExistsNickNameException
      * @throws UserExistsUserNameException
      */
-    void updateUser(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException;
+    void updateUser(UserRecVo user) throws UserExistsNickNameException, UserExistsUserNameException;
 }
 

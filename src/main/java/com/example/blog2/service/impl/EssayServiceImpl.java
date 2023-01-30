@@ -8,7 +8,9 @@ import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.service.UserService;
 import com.example.blog2.service.PicturesService;
 import com.example.blog2.utils.*;
+import com.example.blog2.vo.EssayVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -108,7 +110,7 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
             String k = old.getContent();
             ossUtils.del(k);
             String[] split = k.split("/");
-            if (split.length > 3) {
+            if (split.length > 2) {
                 k = ossConfig.getEssay() + split[2] + "/" + UUID.randomUUID();
             }
             essay.setContent(ossUtils.upload(k, essay.getContent().getBytes(StandardCharsets.UTF_8)));
@@ -177,6 +179,15 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
         }, executor);
 
         log.info("IP：{}，用户[{}], 新增随笔[{}]", IPInterceptor.IP_INFO.get(), essay.getAuthor(), essay.getTitle());
+    }
+
+    @Override
+    public EssayVo getDefaultInfo(Long id) {
+        EssayEntity essay = getById(id);
+        EssayVo vo = new EssayVo();
+        BeanUtils.copyProperties(essay, vo);
+        vo.setContent(new String(ossUtils.load(vo.getContent()), StandardCharsets.UTF_8));
+        return vo;
     }
 
 }

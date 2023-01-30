@@ -22,8 +22,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: 123456
-    url: jdbc:mysql://192.168.88.130:3306/blog?useUnicode=true&characterEncoding=utf-8
-#    url: jdbc:mysql://127.0.0.1:3306/blog?useUnicode=true&characterEncoding=utf-8
+#    url: jdbc:mysql://192.168.88.130:3306/blog?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://127.0.0.1:3306/blog?useUnicode=true&characterEncoding=utf-8
     username: root
     type: com.alibaba.druid.pool.DruidDataSource
     druid:

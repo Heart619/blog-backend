@@ -10,6 +10,7 @@ import com.example.blog2.exception.UserExistsUserNameException;
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
 import com.example.blog2.vo.PasswordUpdateVo;
+import com.example.blog2.vo.UserRecVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +68,7 @@ public class UserController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody UserEntity user){
+    public R update(@RequestBody UserRecVo user){
         try {
             userService.updateUser(user);
             return R.ok("更新成功");

@@ -3,6 +3,7 @@ package com.example.blog2.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.blog2.entity.EssayEntity;
 import com.example.blog2.utils.PageUtils;
+import com.example.blog2.vo.EssayVo;
 
 import java.util.Map;
 
@@ -28,5 +29,12 @@ public interface EssayService extends IService<EssayEntity> {
      * @param id
      */
     void delEssayById(Long id);
+
+    /**
+     * 获取随笔默认信息
+     * @param id
+     * @return
+     */
+    EssayVo getDefaultInfo(Long id);
 }
 

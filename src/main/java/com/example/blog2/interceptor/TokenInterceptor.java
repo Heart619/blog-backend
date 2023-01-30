@@ -1,5 +1,6 @@
 package com.example.blog2.interceptor;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog2.utils.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,17 @@ public class TokenInterceptor implements HandlerInterceptor {
 //        去掉前端返回的token前后的双引号
         token = token.substring(1, token.length() - 1);
         if(!StringUtils.isEmpty(token)){
-            boolean result = TokenUtil.adminVerify(token);
+            boolean result;
+            try {
+                result = TokenUtil.adminVerify(token);
+            } catch (Exception  e) {
+                JSONObject json = new JSONObject();
+                json.put("msg", e.getMessage());
+                json.put("code", HttpStatus.UNAUTHORIZED.value());
+                response.getWriter().append(json.toJSONString());
+                return false;
+            }
+
             if(result){
                 return true;
             }
@@ -49,11 +60,9 @@ public class TokenInterceptor implements HandlerInterceptor {
             json.put("msg", "token verify fail");
             json.put("code", HttpStatus.UNAUTHORIZED.value());
             response.getWriter().append(json.toJSONString());
-            response.sendRedirect("/error");
             log.error("认证失败，未通过拦截器, IP:{}", request.getRemoteAddr());
             return false;
         } catch (Exception e){
-            response.sendRedirect("/error");
             return false;
         }
     }

@@ -89,6 +89,8 @@ public interface BlogService extends IService<BlogEntity> {
     /**
      * 删除博客
      * @param id
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
     void delBlog(Long id) throws ExecutionException, InterruptedException;
 

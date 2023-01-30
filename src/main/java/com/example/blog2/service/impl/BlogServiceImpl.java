@@ -173,20 +173,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-
-        log.info("IP：{}， 博客首页访问", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
     @Override
     public List<BlogEntity> getRecommedBlog() {
-//        log.info("IP：{}， 推荐博客列表获取", IPInterceptor.IP_INFO.get());
         return baseMapper.selectRecommedBlog();
     }
 
     @Override
     public List<BlogEntity> getNewBlog() {
-//        log.info("IP：{}， 读取最新博客", IPInterceptor.IP_INFO.get());
+        log.info("IP：{}， 博客首页访问", IPInterceptor.IP_INFO.get());
         return baseMapper.selectNewBlog();
     }
 
@@ -280,16 +277,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 
     @Override
     public void delBlog(Long id) {
+        String ip = IPInterceptor.IP_INFO.get();
         CompletableFuture.runAsync(() -> {
             // 删除博客内容
             BlogEntity blog = getById(id);
             String img = blog.getFirstPicture();
             if (!DefaultImgUtils.isDefaultBackImg(img)) {
-                ossUtils.del(blog.getFirstPicture());
+                ossUtils.del(img);
             }
             ossUtils.del(blog.getContent());
-
-            log.info("IP：{}， 删除博客[{}]", IPInterceptor.IP_INFO.get(), blog.getTitle());
+            log.info("IP：{}， 删除博客[{}]", ip, blog.getTitle());
         }, executor);
 
         // 删除博客图片
@@ -321,6 +318,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             ossUtils.del(entity.getFirstPicture());
         }
 
+        blog.setUpdateTime(new Date());
         updateById(blog);
     }
 
@@ -341,7 +339,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 
         String[] split = key.split("/");
         if (split.length > 2) {
-            key = ossConfig.getBlog() + split[1] + "/" + UUID.randomUUID();
+            key = ossConfig.getBlog() + split[2] + "/" + UUID.randomUUID();
         }
         blog.setContent(ossUtils.upload(key, blog.getContent().getBytes(StandardCharsets.UTF_8)));
 
@@ -349,16 +347,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             updatePictureBelongBlog(blog.getId());
         }, executor);
 
+        blog.setUpdateTime(new Date());
         updateById(blog);
         log.info("IP：{}，用户[{}], 更新博客[{}]", IPInterceptor.IP_INFO.get(), blog.getUserId(), blog.getTitle());
     }
 
     @Override
     public boolean addBlog(BlogEntity blog) throws ExecutionException, InterruptedException {
-//        TransactionStatus[] status = new TransactionStatus[3];
-
         CompletableFuture<Long> saveFuture = CompletableFuture.supplyAsync(() -> {
-//            status[0] = platformTransactionManager.getTransaction(transactionDefinition);
             blog.setCreateTime(new Date());
             blog.setUpdateTime(new Date());
             blog.setDescription(blog.getContent().substring(0, Math.min(120, blog.getContent().length())));
@@ -378,13 +374,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
 
         CompletableFuture<Void> picturesFuture = saveFuture.thenAcceptAsync(x -> {
-//            status[1] = platformTransactionManager.getTransaction(transactionDefinition);
             RequestContextHolder.setRequestAttributes(attributes);
             updatePictureBelongBlog(x);
         }, executor);
 
         CompletableFuture<Void> blogTagFuture = saveFuture.thenAcceptAsync(a -> {
-//            status[2] = platformTransactionManager.getTransaction(transactionDefinition);
 
             String tagIds = blog.getTagIds();
             String[] split = tagIds.split(",");
@@ -397,27 +391,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             blogTagsService.saveBatch(blogTagsEntities);
         }, executor);
 
-//        try {
-            CompletableFuture.allOf(picturesFuture, blogTagFuture).get();
-//            for (TransactionStatus s : status) {
-//                if (s.isCompleted()) {
-//                    platformTransactionManager.commit(s);
-//                }
-//            }
+        CompletableFuture.allOf(picturesFuture, blogTagFuture).get();
         log.info("IP：{}，用户[{}], 新增博客[{}]", IPInterceptor.IP_INFO.get(), blog.getUserId(), blog.getTitle());
         return true;
-//        } catch (Exception e) {
-//            for (TransactionStatus s : status) {
-//                if (s.isCompleted()) {
-//                    platformTransactionManager.rollback(s);
-//                }
-//            }
-//            return false;
-//        }
     }
 
     @Override
     public void updateType(BlogEntity blog) {
+        blog.setUpdateTime(new Date());
         updateById(blog);
     }
 

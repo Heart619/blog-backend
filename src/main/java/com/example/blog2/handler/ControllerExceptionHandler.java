@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -27,6 +28,9 @@ public class ControllerExceptionHandler {
             throw e;
         }
         log.error("IP : {}, Request URL : {}, Exception : {}", IPInterceptor.IP_INFO.get(), request.getRequestURL(), e.getMessage());
+        if (!StringUtils.isEmpty(e.getMessage())) {
+            return R.error(e.getMessage());
+        }
         return R.error("网络繁忙，请稍后再试");
     }
 }

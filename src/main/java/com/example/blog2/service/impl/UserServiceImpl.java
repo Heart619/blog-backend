@@ -12,15 +12,14 @@ import com.example.blog2.utils.*;
 import com.example.blog2.vo.PasswordUpdateVo;
 import com.example.blog2.vo.UserLocationVo;
 import com.example.blog2.vo.UserLoginVo;
+import com.example.blog2.vo.UserRecVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -84,23 +83,30 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
-    public UserLoginVo login(UserEntity user) throws UserNotFoundException, UserPasswordErrorException {
-        UserEntity u = getOne(new QueryWrapper<UserEntity>().eq("username", user.getUsername()).last("limit 1"));
+    public UserLoginVo login(UserRecVo vo) throws UserNotFoundException, UserPasswordErrorException {
+
+//        try {
+//            RSAUtil.generateKeyPair().setPrivateKeyString(Base64.getEncoder().encodeToString(RSAUtil.getPrivateKey().getEncoded()));
+//            System.out.println(RSAUtil.decrypt(user.getPassword()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        UserEntity u = getOne(new QueryWrapper<UserEntity>().eq("username", vo.getUsername()).last("limit 1"));
         if (u == null) {
             throw new UserNotFoundException();
         }
-        if (!u.getPassword().equals(user.getPassword())) {
+        if (!u.getPassword().equals(vo.getPassword())) {
             throw new UserPasswordErrorException();
         }
 
-        String ip = getIpAddress();
+        String ip = IPInterceptor.IP_INFO.get();
         UserLocationVo locationVo;
         if ("127.0.0.1".equals(ip)) {
             locationVo = getUserLocation(null);
         } else {
             locationVo = getUserLocation(ip);
         }
-
+        UserEntity user = new UserEntity();
         try {
             UserLocationVo.Result result = locationVo.getResult();
             user.setLoginProvince(result.getAd_info().getProvince());
@@ -130,14 +136,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
-    public UserLoginVo register(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException {
+    public UserLoginVo register(UserRecVo u) throws UserExistsNickNameException, UserExistsUserNameException {
 
         try {
-            checkUserNameAndNickName(user);
+            checkUserNameAndNickName(u);
         } catch (UserExistsNickNameException | UserExistsUserNameException e) {
             throw e;
         }
-
+        UserEntity user = new UserEntity();
+        BeanUtils.copyProperties(u, user);
         user.setCreateTime(new Date());
         user.setUpdateTime(new Date());
         user.setLastLoginTime(new Date());
@@ -145,7 +152,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
             user.setAvatar(DefaultImgUtils.getDefaultAvatarImg());
         }
 
-        String ip = getIpAddress();
+        String ip = IPInterceptor.IP_INFO.get();
         UserLocationVo locationVo;
         if ("127.0.0.1".equals(ip)) {
             locationVo = getUserLocation(null);
@@ -171,7 +178,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         return loginVo;
     }
 
-    private void checkUserNameAndNickName(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException {
+    private void checkUserNameAndNickName(UserRecVo user) throws UserExistsNickNameException, UserExistsUserNameException {
         UserEntity one = getOne(new QueryWrapper<UserEntity>().eq("nickname", user.getNickname()).or().eq("username", user.getUsername()).last("limit 1"));
         if (one == null) {
             return;
@@ -244,7 +251,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     }
 
     @Override
-    public void updateUser(UserEntity user) throws UserExistsNickNameException, UserExistsUserNameException {
+    public void updateUser(UserRecVo user) throws UserExistsNickNameException, UserExistsUserNameException {
 
         try {
             checkUserNameAndNickName(user);
@@ -260,46 +267,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
                 messageService.updateMessageForUserUpdate(user.getId(), user.getNickname());
             }, executor);
         }
-
-        updateById(user);
-    }
-
-    private String getIpAddress() {
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = servletRequestAttributes.getRequest();
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip != null && !"".equals(ip) && !"unknown".equalsIgnoreCase(ip)) {
-            if (ip.indexOf (",") > 0) {
-                ip = ip.substring (0, ip.indexOf (","));
-            }
-            if (ip.equals ("127.0.0.1")) {
-                //根据网卡取本机配置的IP
-                InetAddress inet = null;
-                try {
-                    inet = InetAddress.getLocalHost ();
-                } catch (Exception e) {
-                    e.printStackTrace ();
-                }
-                ip = inet.getHostAddress ();
-            }
-        }
-
-        if (request.getHeader("X-Real-IP") != null && !"".equals(request.getHeader("X-Real-IP")) && !"unknown".equalsIgnoreCase(request.getHeader("X-Real-IP"))) {
-            ip = request.getHeader("X-Real-IP");
-        }
-
-        if (request.getHeader("Proxy-Client-IP") != null && !"".equals(request.getHeader("Proxy-Client-IP")) && !"unknown".equalsIgnoreCase(request.getHeader("Proxy-Client-IP"))) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-
-        if (request.getHeader("WL-Proxy-Client-IP") != null && !"".equals(request.getHeader("WL-Proxy-Client-IP")) && !"unknown".equalsIgnoreCase(request.getHeader("WL-Proxy-Client-IP"))) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
+        UserEntity entity = new UserEntity();
+        BeanUtils.copyProperties(user, entity);
+        updateById(entity);
     }
 
     private UserLocationVo getUserLocation(String ip) {

@@ -2,6 +2,7 @@ package com.example.blog2.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog2.entity.UserEntity;
 
 import java.util.Date;
@@ -20,8 +21,8 @@ public class TokenUtil {
 
     private static final long EXPIRE_TIME= 10 * 60 * 60 * 1000;
 
-    //密钥盐
-    private static final String TOKEN_SECRET = "QIUQIULEXIANGQUDACHANG";
+//    //密钥盐
+//    private static final String TOKEN_SECRET = "QIUQIULEXIANGQUDACHANG";
 
     /**
      * 签名生成
@@ -38,7 +39,7 @@ public class TokenUtil {
                     .withClaim("userType", user.getType())
                     .withExpiresAt(expiresAt)
                     // 使用了HMAC256加密算法。
-                    .sign(Algorithm.HMAC256(TOKEN_SECRET));
+                    .sign(Algorithm.RSA256(RSAUtil.getPublicKey(), RSAUtil.getPrivateKey()));
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -52,7 +53,11 @@ public class TokenUtil {
      */
     public static boolean verify(String token){
         try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).withIssuer("auth0").build();
+            JWTVerifier verifier = JWT
+                    .require(Algorithm.RSA256(RSAUtil.getPublicKey(), RSAUtil.getPrivateKey()))
+                    .withIssuer("auth0")
+                    .build();
+
             DecodedJWT jwt = verifier.verify(token);
             System.out.println("userId: " + jwt.getClaim("userId").asString());
             System.out.println("userType: " + jwt.getClaim("userType").asString());
@@ -68,17 +73,22 @@ public class TokenUtil {
      * @param token
      * @return
      */
-    public static boolean adminVerify(String token){
+    public static boolean adminVerify(String token) {
         try {
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).withIssuer("auth0").build();
+            JWTVerifier verifier = JWT
+                    .require(Algorithm.RSA256(RSAUtil.getPublicKey(), RSAUtil.getPrivateKey()))
+                    .withIssuer("auth0")
+                    .build();
+
             DecodedJWT jwt = verifier.verify(token);
             if (jwt.getClaim("userType").asInt() > 0){
                 return true;
             }
             return false;
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
+        } catch (TokenExpiredException e){
+            throw new TokenExpiredException("用户登陆过期，请重新登陆");
+        } catch (Exception e) {
+            throw new RuntimeException("非法用户");
         }
     }
 

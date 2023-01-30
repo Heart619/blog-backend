@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
+import com.example.blog2.vo.EssayVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,19 +55,14 @@ public class EssayController {
         return R.ok();
     }
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		essayService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
-
     @PostMapping("/{id}/delete")
     public R delEssay(@PathVariable("id") Long id) {
         essayService.delEssayById(id);
         return R.ok();
+    }
+
+    @GetMapping("/default/{id}")
+    public R getEssayDefaultInfo(@PathVariable("id") Long id) {
+        return R.ok().put("data", essayService.getDefaultInfo(id));
     }
 }
