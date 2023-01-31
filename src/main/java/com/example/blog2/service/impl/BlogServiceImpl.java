@@ -485,7 +485,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 
     private String getText(String content) {
         byte[] bytes = ossUtils.load(content);
-        return MarkdownUtils.markdownToHtmlExtensions(new String(bytes, StandardCharsets.UTF_8));
+        return new String(bytes, StandardCharsets.UTF_8);
+//        return MarkdownUtils.markdownToHtmlExtensions(new String(bytes, StandardCharsets.UTF_8));
     }
 
 }
