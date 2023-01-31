@@ -350,11 +350,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             ossUtils.del(key);
         }
 
-        String[] split = key.split("/");
-        if (split.length > 2) {
-            key = ossConfig.getBlog() + split[2] + "/" + UUID.randomUUID();
-        }
-        blog.setContent(ossUtils.upload(key, blog.getContent().getBytes(StandardCharsets.UTF_8)));
+        blog.setContent(ossUtils.upload(ossConfig.getBlog() + UUID.randomUUID(), blog.getContent().getBytes(StandardCharsets.UTF_8)));
 
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         CompletableFuture.runAsync(() -> {
@@ -380,9 +376,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             if (StringUtils.isEmpty(blog.getFirstPicture())) {
                 blog.setFirstPicture(DefaultImgUtils.getDefaultBackImg());
             }
-            String k = ossConfig.getBlog() + LocalDate.now() + "/" + UUID.randomUUID();
-            ossUtils.upload(k, blog.getContent().getBytes(StandardCharsets.UTF_8));
-            blog.setContent(k);
+            blog.setContent(ossUtils.upload(ossConfig.getBlog() + UUID.randomUUID(), blog.getContent().getBytes(StandardCharsets.UTF_8)));
             blog.setPublished(false);
             blog.setRecommend(true);
             blog.setShareStatement(false);
