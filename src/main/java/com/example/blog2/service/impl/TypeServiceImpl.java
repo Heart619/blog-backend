@@ -89,7 +89,7 @@ public class TypeServiceImpl extends ServiceImpl<TypeDao, TypeEntity> implements
 
     @Override
     public boolean delType(Long id) {
-        BlogEntity blog = blogDao.selectOne(new QueryWrapper<BlogEntity>().eq("type_id", id));
+        BlogEntity blog = blogDao.selectOne(new QueryWrapper<BlogEntity>().eq("type_id", id).last("limit 1"));
         if (blog != null) {
             return false;
         }

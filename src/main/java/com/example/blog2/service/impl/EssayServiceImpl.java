@@ -62,7 +62,7 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
     private ThreadPoolExecutor executor;
 
     @Override
-    public PageUtils queryPage(Map<String, Object> params) {
+    public PageUtils queryDetaiilPage(Map<String, Object> params) {
         QueryWrapper<EssayEntity> queryWrapper = new QueryWrapper<>();
 
         String userId = (String) params.get("userId");
@@ -96,6 +96,29 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
         });
 
         log.info("IP：{}， 随笔信息查询", IPInterceptor.IP_INFO.get());
+        return new PageUtils(page);
+    }
+
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<EssayEntity> queryWrapper = new QueryWrapper<>();
+
+        String userId = (String) params.get("userId");
+        if (!StringUtils.isEmpty(userId)) {
+            queryWrapper.eq("author", userId);
+        }
+
+        String search = (String) params.get("search");
+        if (!StringUtils.isEmpty(search)) {
+            queryWrapper.like("title", search);
+        }
+
+        queryWrapper.orderByDesc("create_time");
+        IPage<EssayEntity> page = this.page(
+                new Query<EssayEntity>().getPage(params),
+                queryWrapper
+        );
         return new PageUtils(page);
     }
 
@@ -198,6 +221,9 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
     public EssayVo getDefaultInfo(Long id) {
         EssayEntity essay = getById(id);
         EssayVo vo = new EssayVo();
+        if (essay == null) {
+            throw new RuntimeException("这篇随笔消失了");
+        }
         BeanUtils.copyProperties(essay, vo);
         vo.setContent(new String(ossUtils.load(vo.getContent()), StandardCharsets.UTF_8));
         return vo;

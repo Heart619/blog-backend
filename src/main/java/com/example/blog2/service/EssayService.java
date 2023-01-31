@@ -36,5 +36,12 @@ public interface EssayService extends IService<EssayEntity> {
      * @return
      */
     EssayVo getDefaultInfo(Long id);
+
+    /**
+     * 详细分页信息查询
+     * @param params
+     * @return
+     */
+    PageUtils queryDetaiilPage(Map<String, Object> params);
 }
 

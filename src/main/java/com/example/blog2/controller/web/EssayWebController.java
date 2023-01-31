@@ -23,6 +23,13 @@ public class EssayWebController {
 
     @GetMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
+        PageUtils page = essayService.queryDetaiilPage(params);
+
+        return R.ok().put("page", page);
+    }
+
+    @GetMapping("/list/back")
+    public R backList(@RequestParam Map<String, Object> params){
         PageUtils page = essayService.queryPage(params);
 
         return R.ok().put("page", page);

@@ -29,7 +29,7 @@ public class BlogWebController {
         return R.ok().put("page", page);
     }
 
-    @GetMapping("/{blog}")
+    @GetMapping("/{blog}.html")
     public R bolgInfo(@PathVariable("blog") Long id) throws ExecutionException, InterruptedException {
         BlogEntity blog = blogService.getBlogInfo(id);
         if (blog == null) {

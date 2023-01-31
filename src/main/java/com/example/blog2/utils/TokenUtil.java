@@ -98,7 +98,7 @@ public class TokenUtil {
     }
 
     public static boolean checkCurUserStatus(Long id) {
-        return TokenInterceptor.CUR_USER_INFO.get().getId().equals(id) || TokenInterceptor.CUR_USER_INFO.get().getType().compareTo(2) == 0;
+        return TokenInterceptor.CUR_USER_INFO.get().getId().equals(id) || TokenInterceptor.CUR_USER_INFO.get().getType().equals(2);
     }
 
     public static boolean checkUserType() {

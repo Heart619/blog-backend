@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class EssayVo {
 
+    private Long id;
     private String title;
     private String content;
     private String color;
