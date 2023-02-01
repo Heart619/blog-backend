@@ -1,12 +1,6 @@
 package com.example.blog2.controller;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.example.blog2.utils.PageUtils;
 import com.example.blog2.utils.R;
-import com.example.blog2.vo.EssayVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
