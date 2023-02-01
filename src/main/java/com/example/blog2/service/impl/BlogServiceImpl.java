@@ -10,7 +10,6 @@ import com.example.blog2.service.*;
 import com.example.blog2.utils.*;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -350,7 +349,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             ossUtils.del(key);
         }
 
-        blog.setContent(ossUtils.upload(ossConfig.getBlog() + UUID.randomUUID(), blog.getContent().getBytes(StandardCharsets.UTF_8)));
+        blog.setContent(ossUtils.upload(ossConfig.getTextSrc() + UUID.randomUUID(), blog.getContent().getBytes(StandardCharsets.UTF_8)));
 
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         CompletableFuture.runAsync(() -> {
@@ -376,7 +375,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             if (StringUtils.isEmpty(blog.getFirstPicture())) {
                 blog.setFirstPicture(DefaultImgUtils.getDefaultBackImg());
             }
-            blog.setContent(ossUtils.upload(ossConfig.getBlog() + UUID.randomUUID(), blog.getContent().getBytes(StandardCharsets.UTF_8)));
+            blog.setContent(ossUtils.upload(ossConfig.getTextSrc() + UUID.randomUUID(), blog.getContent().getBytes(StandardCharsets.UTF_8)));
             blog.setPublished(false);
             blog.setRecommend(true);
             blog.setShareStatement(false);

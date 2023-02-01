@@ -37,11 +37,12 @@ spring:
 three:
   oss:
     accessKey: Djaw32O83II324ZtpxvlCmUH1FTi7hOuOVr6vRuN
-    blog: text/blog/
     bucket: mxp-blog
-    essay: text/essay/
     region: http://roxuynt15.hd-bkt.clouddn.com
     secretKey: 6nX92UklXiZf7KOYBtTVOss3xG4RGvP4O1mYmi3s
+    textSrc: text/
+    imgSrc: img/
+    otherSrc: default/
   location:
     key: FJNBZ-4B6KX-UJM4X-ZWZUG-DPMMS-GQFXD
 

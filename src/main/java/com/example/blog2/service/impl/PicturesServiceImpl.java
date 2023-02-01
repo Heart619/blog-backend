@@ -70,7 +70,7 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
         }
 
         byte[] bytes = file.getBytes();
-        String key = LocalDate.now() + "/" + UUID.randomUUID() + file.getOriginalFilename();
+        String key = ossConfig.getImgSrc() + UUID.randomUUID() + file.getOriginalFilename();
         ossUtils.upload(key, bytes);
         PicturesEntity picture = new PicturesEntity();
         picture.setImage(key);

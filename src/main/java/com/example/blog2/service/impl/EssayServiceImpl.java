@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -136,14 +135,14 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
             }
 
             ossUtils.del(old.getContent());
-            essay.setContent(ossUtils.upload(ossConfig.getEssay() + UUID.randomUUID(), essay.getContent().getBytes(StandardCharsets.UTF_8)));
+            essay.setContent(ossUtils.upload(ossConfig.getTextSrc() + UUID.randomUUID(), essay.getContent().getBytes(StandardCharsets.UTF_8)));
             this.updateById(essay);
             log.info("IP：{}，用户[{}], 更新随笔[{}]", IPInterceptor.IP_INFO.get(), essay.getAuthor(), essay.getTitle());
         } else {
             if (!TokenUtil.checkUserType()) {
                 throw new UserStatusException();
             }
-            essay.setContent(ossUtils.upload(ossConfig.getEssay() + UUID.randomUUID(), essay.getContent().getBytes(StandardCharsets.UTF_8)));
+            essay.setContent(ossUtils.upload(ossConfig.getTextSrc() + UUID.randomUUID(), essay.getContent().getBytes(StandardCharsets.UTF_8)));
             essay.setCreateTime(new Date());
             this.save(essay);
             log.info("IP：{}，用户[{}], 新增随笔[{}]", IPInterceptor.IP_INFO.get(), essay.getAuthor(), essay.getTitle());

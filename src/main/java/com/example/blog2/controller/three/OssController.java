@@ -26,7 +26,7 @@ public class OssController {
         Auth auth = Auth.create(ossConfig.getAccessKey(), ossConfig.getSecretKey());
         UploadTokenTo token = new UploadTokenTo();
         token.setToken(auth.uploadToken(ossConfig.getBucket()));
-        token.setDir(LocalDate.now().toString());
+        token.setDir(ossConfig.getImgSrc());
         return token;
     }
 }
