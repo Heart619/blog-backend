@@ -118,6 +118,18 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
                 new Query<EssayEntity>().getPage(params),
                 queryWrapper
         );
+        Map<Long, UserEntity> map = userService.getUserAvatarAndNickName().stream().collect(Collectors.toMap(UserEntity::getId, x -> x));
+        page.getRecords().forEach(x -> {
+            x.setContent(null);
+            UserEntity user = map.get(x.getAuthor());
+            if (user != null) {
+                x.setNickName(user.getNickname());
+                x.setAvatar(user.getAvatar());
+            } else {
+                x.setNickName("用户已注销");
+                x.setAvatar(DefaultImgUtils.getDefaultAvatarImg());
+            }
+        });
         return new PageUtils(page);
     }
 

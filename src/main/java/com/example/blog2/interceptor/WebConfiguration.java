@@ -43,9 +43,12 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry){
         //排除拦截，除了注册登录(此时还没token)，其他都拦截
-        registry.addInterceptor(ipInterceptor).addPathPatterns("/**");
-
         registry.addInterceptor(tokenInterceptor)
-                .addPathPatterns("/admin/**");
+                .addPathPatterns("/admin/**")
+                .order(0);
+
+        registry.addInterceptor(ipInterceptor)
+                .addPathPatterns("/**")
+                .order(1);
     }
 }

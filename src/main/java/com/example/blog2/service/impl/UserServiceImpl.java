@@ -3,6 +3,7 @@ package com.example.blog2.service.impl;
 import com.example.blog2.config.TencentServerConfig;
 import com.example.blog2.exception.*;
 import com.example.blog2.interceptor.IPInterceptor;
+import com.example.blog2.interceptor.TokenInterceptor;
 import com.example.blog2.service.CommentService;
 import com.example.blog2.service.MessageService;
 import com.example.blog2.utils.*;
@@ -200,7 +201,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Override
     public UserLoginVo updatePwd(PasswordUpdateVo vo) throws Exception {
-
         if (!TokenUtil.checkCurUserStatus(vo.getId())) {
             throw new UserStatusException();
         }
