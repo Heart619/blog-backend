@@ -1,28 +1,11 @@
 package com.example.blog2.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.reactive.CorsWebFilter;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
-
-//    @Bean
-//    public CorsWebFilter corsWebFilter() {
-//        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
-//        // 配置跨域
-//        org.springframework.web.cors.CorsConfiguration corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-//        corsConfiguration.addAllowedOriginPattern("*");
-//        corsConfiguration.addAllowedHeader("*");
-//        corsConfiguration.addAllowedMethod("*");
-//        corsConfiguration.setAllowCredentials(true);
-//
-//        corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-//        return new CorsWebFilter(corsConfigurationSource);
-//    }
 
     static final String[] ORIGINS = new String[]{"GET", "POST", "PUT", "DELETE", "OPTIONS"};
 

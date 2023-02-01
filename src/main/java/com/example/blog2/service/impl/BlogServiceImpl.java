@@ -432,15 +432,19 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             throw new UserStatusException();
         }
 
-        TagEntity tag = new TagEntity();
-        tag.setName(name);
-        tagService.save(tag);
+        TagEntity entity = tagService.getOne(new QueryWrapper<TagEntity>().eq("name", name).last("limit 1"));
+        if (entity == null) {
+            TagEntity tag = new TagEntity();
+            tag.setName(name);
+            tagService.save(tag);
+            entity = tag;
+        }
 
         BlogTagsEntity blogTags = new BlogTagsEntity();
         blogTags.setBlogsId(id);
-        blogTags.setTagsId(tag.getId());
+        blogTags.setTagsId(entity.getId());
         blogTagsService.save(blogTags);
-        return tag;
+        return entity;
     }
 
     /**

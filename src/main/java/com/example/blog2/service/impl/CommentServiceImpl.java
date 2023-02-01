@@ -55,7 +55,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
         });
         page.setRecords(records);
 
-//        log.info("IP：{}， 分页查询评论", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
