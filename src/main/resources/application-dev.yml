@@ -54,4 +54,4 @@ rsa:
 my:
   thread:
     core: 12
-    max: 12
+    capacity: 5000

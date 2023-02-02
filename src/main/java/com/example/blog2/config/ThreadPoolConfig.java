@@ -19,12 +19,14 @@ public class ThreadPoolConfig {
 
     @Bean
     public ThreadPoolExecutor threadPoolExecutor(ThreadProperties properties) {
+        //核心线程数:设置为操作系统CPU数乘以2
+        int core = Runtime.getRuntime().availableProcessors() * 2;
         return new ThreadPoolExecutor(
-                properties.getCore(),
-                properties.getMax(),
-                15,
+                core,
+                core,
+                0,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(20000),
+                new LinkedBlockingQueue<>(properties.getCapacity()),
                 Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.AbortPolicy()
         );

@@ -11,5 +11,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "my.thread")
 public class ThreadProperties {
     private Integer core;
-    private Integer max;
+    private Integer capacity;
 }
