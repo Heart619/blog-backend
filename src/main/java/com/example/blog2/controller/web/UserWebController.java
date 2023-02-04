@@ -10,10 +10,7 @@ import com.example.blog2.service.UserService;
 import com.example.blog2.utils.R;
 import com.example.blog2.vo.UserRecVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author mxp
@@ -21,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("/user")
 public class UserWebController {
 
     @Autowired
@@ -40,6 +37,12 @@ public class UserWebController {
                 throw e;
             }
         }
+    }
+
+    @GetMapping("/refresh")
+    public R refreshToken() {
+        String token = userService.refreshToken();
+        return R.ok().put("data", token);
     }
 
     @PostMapping("/register")

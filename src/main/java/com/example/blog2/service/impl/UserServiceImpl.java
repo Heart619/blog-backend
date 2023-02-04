@@ -1,5 +1,6 @@
 package com.example.blog2.service.impl;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog2.config.TencentServerConfig;
 import com.example.blog2.exception.*;
 import com.example.blog2.interceptor.IPInterceptor;
@@ -117,6 +118,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         UserLoginVo userLoginVo = new UserLoginVo();
         userLoginVo.setToken(TokenUtil.sign(u));
         userLoginVo.setUser(u);
+        userLoginVo.setRefreshToken(TokenUtil.getRefreshToken(u));
 
         log.info("IP：{}，用户 [{}] 登陆，登陆地点：[{}-{}-{}-{}] ", result.getIp(), u.getNickname(), result.getAd_info().getNation(), user.getLoginProvince(), user.getLoginCity(), result.getAd_info().getDistrict());
         return userLoginVo;
@@ -158,6 +160,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         UserLoginVo loginVo = new UserLoginVo();
         loginVo.setToken(TokenUtil.sign(user));
         loginVo.setUser(user);
+        loginVo.setRefreshToken(TokenUtil.getRefreshToken(user));
+
         return loginVo;
     }
 
@@ -271,6 +275,27 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         UserEntity entity = new UserEntity();
         BeanUtils.copyProperties(user, entity);
         updateById(entity);
+    }
+
+    @Override
+    public String refreshToken() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        String refresh = request.getHeader("refresh");
+        if (StringUtils.isEmpty(refresh)) {
+            throw new RuntimeException("用户身份异常");
+        }
+        refresh = refresh.substring(1, refresh.length() - 1);
+        TokenInterceptor.UserTokenInfo adminVerify = null;
+        try {
+            adminVerify = TokenUtil.adminVerify(refresh);
+        } catch (TokenExpiredException e) {
+            throw new RefreshExpiresException(410, "用户登陆过期，请重新登陆");
+        }
+        UserEntity user = new UserEntity();
+        user.setId(adminVerify.getId());
+        user.setType(adminVerify.getType());
+        return TokenUtil.sign(user);
     }
 
     private UserLocationVo getUserLocation(String ip) {

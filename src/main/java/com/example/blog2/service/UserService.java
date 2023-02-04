@@ -78,5 +78,11 @@ public interface UserService extends IService<UserEntity> {
      * @throws UserExistsUserNameException
      */
     void updateUser(UserRecVo user) throws UserExistsNickNameException, UserExistsUserNameException;
+
+    /**
+     * 刷新token
+     * @return
+     */
+    String refreshToken();
 }
 

@@ -1,5 +1,6 @@
 package com.example.blog2.handler;
 
+import com.example.blog2.exception.RefreshExpiresException;
 import com.example.blog2.interceptor.IPInterceptor;
 import com.example.blog2.utils.R;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,10 @@ public class ControllerExceptionHandler {
         }
         log.error("IP : {}, Request URL : {}, Exception : {}", IPInterceptor.IP_INFO.get(), request.getRequestURL(), e.getMessage());
         e.printStackTrace();
+        if (e instanceof RefreshExpiresException) {
+            RefreshExpiresException exception = (RefreshExpiresException) e;
+            return R.error(exception.getCode(), exception.getMessage());
+        }
         if (!StringUtils.isEmpty(e.getMessage())) {
             return R.error(e.getMessage());
         }

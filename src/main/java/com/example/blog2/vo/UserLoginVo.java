@@ -12,4 +12,5 @@ public class UserLoginVo {
 
     private UserEntity user;
     private String token;
+    private String refreshToken;
 }

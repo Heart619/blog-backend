@@ -8,20 +8,19 @@ import com.example.blog2.entity.UserEntity;
 import java.util.Date;
 
 /**
- * @author hikari
- * @version 1.0
- * @date 2021/7/6 16:39
+ * @author mxp
  */
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.blog2.exception.UserStatusException;
 import com.example.blog2.interceptor.TokenInterceptor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TokenUtil {
 
-    private static final long EXPIRE_TIME = 10 * 60 * 60 * 1000;
+    private static final long EXPIRE_TIME = 12L * 60 * 60 * 1000;
+
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 15L * 24 * 60 * 60 * 1000;
 
 //    //密钥盐
 //    private static final String TOKEN_SECRET = "QIUQIULEXIANGQUDACHANG";
@@ -35,6 +34,23 @@ public class TokenUtil {
         String token = null;
         try {
             Date expiresAt = new Date(System.currentTimeMillis() + EXPIRE_TIME);
+            token = JWT.create()
+                    .withIssuer("auth0")
+                    .withClaim("userId", user.getId())
+                    .withClaim("userType", user.getType())
+                    .withExpiresAt(expiresAt)
+                    // 使用了HMAC256加密算法。
+                    .sign(Algorithm.RSA256(RSAUtil.getPublicKey(), RSAUtil.getPrivateKey()));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return token;
+    }
+
+    public static String getRefreshToken(UserEntity user){
+        String token = null;
+        try {
+            Date expiresAt = new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRE_TIME);
             token = JWT.create()
                     .withIssuer("auth0")
                     .withClaim("userId", user.getId())
@@ -81,7 +97,6 @@ public class TokenUtil {
                     .require(Algorithm.RSA256(RSAUtil.getPublicKey(), RSAUtil.getPrivateKey()))
                     .withIssuer("auth0")
                     .build();
-
             DecodedJWT jwt = verifier.verify(token);
             if (jwt.getClaim("userType").asInt() > 0){
                 TokenInterceptor.UserTokenInfo tokenInfo = new TokenInterceptor.UserTokenInfo();

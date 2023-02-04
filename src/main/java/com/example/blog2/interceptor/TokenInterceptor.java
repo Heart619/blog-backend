@@ -39,7 +39,6 @@ public class TokenInterceptor implements HandlerInterceptor {
         }
         response.setCharacterEncoding("UTF-8");
         String token = request.getHeader("token");
-
         if(!StringUtils.isEmpty(token)){
 //        去掉前端返回的token前后的双引号
             token = token.substring(1, token.length() - 1);
@@ -51,10 +50,16 @@ public class TokenInterceptor implements HandlerInterceptor {
                 }
                 CUR_USER_INFO.set(userTokenInfo);
                 return true;
-            } catch (Exception  e) {
+            } catch (TokenExpiredException  e) {
                 JSONObject json = new JSONObject();
                 json.put("msg", e.getMessage());
                 json.put("code", HttpStatus.UNAUTHORIZED.value());
+                response.getWriter().append(json.toJSONString());
+                return false;
+            } catch (Exception e) {
+                JSONObject json = new JSONObject();
+                json.put("msg", e.getMessage());
+                json.put("code", 444);
                 response.getWriter().append(json.toJSONString());
                 return false;
             }
