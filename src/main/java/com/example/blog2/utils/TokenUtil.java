@@ -18,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TokenUtil {
 
-    private static final long EXPIRE_TIME = 12L * 60 * 60 * 1000;
+    private static final long EXPIRE_TIME = 2L * 60 * 60 * 1000;
 
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 15L * 24 * 60 * 60 * 1000;
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 14L * 24 * 60 * 60 * 1000;
 
 //    //密钥盐
 //    private static final String TOKEN_SECRET = "QIUQIULEXIANGQUDACHANG";
