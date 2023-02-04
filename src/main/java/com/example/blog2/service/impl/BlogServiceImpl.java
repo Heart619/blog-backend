@@ -107,27 +107,29 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
         if (userId != null) {
             queryWrapper.eq("user_id", userId);
         }
+
+        Object tagId1 = params.get("tagId");
+        if (tagId1 != null) {
+            Long tagId = Long.valueOf(String.valueOf(tagId1));
+            if (!tagId.equals(-1L)) {
+                List<BlogTagsEntity> entityList = blogTagsService.list(new QueryWrapper<BlogTagsEntity>().eq("tags_id", tagId));
+                Set<Long> set = entityList.stream().map(BlogTagsEntity::getBlogsId).collect(Collectors.toSet());
+                if (set.isEmpty()) {
+                    queryWrapper.eq("id", -1);
+                } else {
+                    queryWrapper.in("id", set);
+                }
+            }
+        }
+
         queryWrapper.orderByDesc("create_time", "views");
         IPage<BlogEntity> page = this.page(
                 new Query<BlogEntity>().getPage(params),
                 queryWrapper
         );
 
-        CompletableFuture<Void> tagFuture = CompletableFuture.runAsync(() -> {
-            Object tagId1 = params.get("tagId");
-            if (tagId1 != null) {
-                Long tagId = Long.valueOf(String.valueOf(tagId1));
-                if (!tagId.equals(-1L)) {
-                    List<BlogTagsEntity> entityList = blogTagsService.list(new QueryWrapper<BlogTagsEntity>().eq("tags_id", tagId));
-                    Set<Long> set = entityList.stream().map(BlogTagsEntity::getBlogsId).collect(Collectors.toSet());
-                    List<BlogEntity> collect = page.getRecords().stream().filter(x -> set.contains(x.getId())).collect(Collectors.toList());
-                    page.setRecords(collect);
-                }
-            }
-        }, executor);
         List<BlogEntity> records = page.getRecords();
-
-        CompletableFuture<Void> userFuture = tagFuture.thenRunAsync(() -> {
+        CompletableFuture<Void> userFuture = CompletableFuture.runAsync(() -> {
             List<UserEntity> userEntities = userDao.selectUserAvatarAndNickName();
             Map<Long, TypeEntity> typeEntityMap = typeService.list().stream().collect(Collectors.toMap(TypeEntity::getId, (x) -> x));
             Map<Long, UserEntity> map = userEntities.stream().collect(Collectors.toMap(UserEntity::getId, (x) -> x));
@@ -145,7 +147,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             });
         }, executor);
 
-        CompletableFuture<Void> tagsFuture = tagFuture.thenRunAsync(() -> {
+        CompletableFuture<Void> tagsFuture = CompletableFuture.runAsync(() -> {
             Object needTags = params.get("needTags");
             if (needTags != null) {
                 List<TagEntity> list = tagService.list();
@@ -173,10 +175,8 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             }
         }, executor);
 
-
         try {
             CompletableFuture.allOf(userFuture, tagsFuture).get();
-
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
