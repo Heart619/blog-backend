@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2023/2/5 19:48
  */
 @Component
-@ServerEndpoint("/online")
+@ServerEndpoint("/websocket/online")
 public class OnlineWebSocket {
 
     private static final long expiresTime = 60 * 60 * 2L * 1000;
