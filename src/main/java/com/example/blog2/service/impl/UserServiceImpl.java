@@ -52,9 +52,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
     private ThreadPoolExecutor executor;
 
     @Autowired
-    private TencentServerConfig tencentServerConfig;
-
-    @Autowired
     private MessageService messageService;
 
     @Autowired
@@ -95,10 +92,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         }
 
         String ip = IPInterceptor.IP_INFO.get();
-        UserLocationVo locationVo = getUserLocation(ip);
-        if (locationVo.getResult() == null && locationVo.getStatus().equals(375)) {
-            locationVo = getUserLocation(null);
-        }
+        UserLocationVo locationVo = LocationUtil.getUserLocation(ip);
         UserEntity user = new UserEntity();
         UserLocationVo.Result result = locationVo.getResult();
         user.setLoginProvince(result.getAd_info().getProvince());
@@ -142,10 +136,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         }
 
         String ip = IPInterceptor.IP_INFO.get();
-        UserLocationVo locationVo = getUserLocation(ip);
-        if (locationVo.getResult() == null && locationVo.getStatus().equals(375)) {
-            locationVo = getUserLocation(null);
-        }
+        UserLocationVo locationVo = LocationUtil.getUserLocation(ip);
         UserLocationVo.Result result = locationVo.getResult();
         user.setLoginProvince(result.getAd_info().getProvince());
         user.setLoginCity(result.getAd_info().getCity());
@@ -296,18 +287,5 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         user.setId(adminVerify.getId());
         user.setType(adminVerify.getType());
         return TokenUtil.sign(user);
-    }
-
-    private UserLocationVo getUserLocation(String ip) {
-        RestTemplate restTemplate = new RestTemplate();
-        StringBuilder url = new StringBuilder("https://apis.map.qq.com/ws/location/v1/ip?key=");
-        url.append(tencentServerConfig.getKey());
-        if (!StringUtils.isEmpty(ip)) {
-            url.append("&ip=").append(ip);
-        }
-        return restTemplate.getForObject(
-                url.toString(),
-                UserLocationVo.class
-        );
     }
 }
