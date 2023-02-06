@@ -390,6 +390,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
             ossUtils.del(key);
         }
 
+        blog.setDescription(blog.getContent().substring(0, Math.min(120, blog.getContent().length())));
         blog.setContent(ossUtils.upload(ossConfig.getTextSrc() + UUID.randomUUID(), blog.getContent().getBytes(StandardCharsets.UTF_8)));
 
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
