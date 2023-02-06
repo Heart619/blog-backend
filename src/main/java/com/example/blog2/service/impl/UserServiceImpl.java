@@ -30,6 +30,7 @@ import com.example.blog2.dao.UserDao;
 import com.example.blog2.entity.UserEntity;
 import com.example.blog2.service.UserService;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -285,12 +286,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         UserEntity user = new UserEntity();
         user.setId(adminVerify.getId());
         user.setType(adminVerify.getType());
-
-        CompletableFuture.runAsync(() -> {
-            user.setLastLoginTime(new Date());
-            updateById(user);
-        }, executor);
-
         return TokenUtil.sign(user);
     }
 }
