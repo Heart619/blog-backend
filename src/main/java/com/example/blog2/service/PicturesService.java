@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public interface PicturesService extends IService<PicturesEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+    PageUtils queryPage(Map<String, Object> params, boolean visAll);
 
     /**
      * 上传博客内容中的图片
@@ -47,5 +47,10 @@ public interface PicturesService extends IService<PicturesEntity> {
      */
     void delPic(PicturesEntity pictures);
 
+    /**
+     * 更新照片可见状态
+     * @param pictures
+     */
+    void updateShowStatus(PicturesEntity pictures);
 }
 

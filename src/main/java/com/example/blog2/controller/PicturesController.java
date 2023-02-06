@@ -31,12 +31,11 @@ public class PicturesController {
      * 列表
      */
     @GetMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = picturesService.queryPage(params);
+    public R AllList(@RequestParam Map<String, Object> params){
+        PageUtils page = picturesService.queryPage(params, true);
 
         return R.ok().put("page", page);
     }
-
 
     /**
      * 信息
@@ -77,18 +76,15 @@ public class PicturesController {
         return R.ok();
     }
 
-
-
     @PostMapping("/upload")
     public R upload(@RequestParam("file") MultipartFile file) throws IOException {
         String img = picturesService.upload(file);
         return R.ok().put("data", img);
     }
 
-    @GetMapping("/getWallImg")
-    public R getWallImg() {
-        List<PicturesEntity> picturesEntityList = picturesService.getWallImg();
-        return R.ok().put("data", picturesEntityList);
+    @PostMapping("/updateShowStatus")
+    public R updateShowStatus(@RequestBody PicturesEntity pictures){
+        picturesService.updateShowStatus(pictures);
+        return R.ok();
     }
-
 }

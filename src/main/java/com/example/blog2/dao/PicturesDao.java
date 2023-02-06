@@ -22,4 +22,10 @@ public interface PicturesDao extends BaseMapper<PicturesEntity> {
      * @param type
      */
     void updateOldPicturesByLongId(@Param("lid") Long lid, @Param("blogId") Long blogId, @Param("type") Integer type);
+
+    /**
+     * 更新照片可见状态
+     * @param pictures
+     */
+    void updatePicTypeById(PicturesEntity pictures);
 }

@@ -15,6 +15,11 @@
         set belong = #{blogId}, type = #{type}
         where belong = #{lid}
     </update>
+    <update id="updatePicTypeById">
+        update t_pictures
+        set type = #{type}
+        where id = #{id}
+    </update>
 
 
 </mapper>

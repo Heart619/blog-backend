@@ -42,7 +42,7 @@
         from t_blog b
         inner join t_type t
         on b.type_id = t.id
-        order by b.update_time desc
+        order by b.views desc, b.update_time desc
         limit 7
     </select>
 

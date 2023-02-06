@@ -1,5 +1,6 @@
 package com.example.blog2.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.example.blog2.config.OSSConfig;
@@ -53,13 +54,21 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
     private OSSConfig ossConfig;
 
     @Override
-    public PageUtils queryPage(Map<String, Object> params) {
+    public PageUtils queryPage(Map<String, Object> params, boolean visAll) {
+        QueryWrapper<PicturesEntity> queryWrapper;
+        if (visAll) {
+            queryWrapper = new QueryWrapper<PicturesEntity>().ge("type", 2);
+        } else {
+            queryWrapper = new QueryWrapper<PicturesEntity>().eq("type", 2);
+        }
+        return query(params, queryWrapper);
+    }
+
+    private PageUtils query(Map<String, Object> params, Wrapper<PicturesEntity> queryWrapper) {
         IPage<PicturesEntity> page = this.page(
                 new Query<PicturesEntity>().getPage(params),
-                new QueryWrapper<PicturesEntity>().eq("type", 2)
+                queryWrapper
         );
-
-//        log.info("IP：{}，读取照片墙", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
@@ -131,6 +140,11 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
         ossUtils.del(pictures.getImage());
         removeById(pictures.getId());
         log.info("IP：{}，删除照片[{}]", IPInterceptor.IP_INFO.get(), pictures.getType());
+    }
+
+    @Override
+    public void updateShowStatus(PicturesEntity pictures) {
+        baseMapper.updatePicTypeById(pictures);
     }
 
 }
