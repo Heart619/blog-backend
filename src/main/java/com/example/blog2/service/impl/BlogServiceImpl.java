@@ -190,7 +190,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogDao, BlogEntity> implements
 
     @Override
     public List<BlogEntity> getNewBlog() {
-        log.info("IP：{}， 博客首页访问", IPInterceptor.IP_INFO.get());
         return baseMapper.selectNewBlog();
     }
 

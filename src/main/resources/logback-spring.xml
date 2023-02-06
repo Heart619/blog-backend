@@ -28,56 +28,6 @@
     </appender>
 
 
-    <!--输出到文件-->
-    <!-- 时间滚动输出 level为 DEBUG 日志 -->
-    <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 正在记录的日志文件的路径及文件名 -->
-        <!--先将今天的日志保存在这个文件中-->
-        <file>${log.path}/log_debug.log</file>
-        <!--日志文件输出格式   %-d{yyyy-MM-dd HH:mm:ss}  [ %t:%r ] - [ %p ]  %m%n
-            %d{HH: mm:ss.SSS}——日志输出时间
-            %thread——输出日志的进程名字，这在Web应用以及异步任务处理中很有用
-            %-5level——日志级别，并且使用5个字符靠左对齐
-            %logger{36}——日志输出者的名字
-            %msg——日志消息
-            %n——平台的换行符
-           -->
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
-            <charset>UTF-8</charset> <!-- 设置字符集 -->
-        </encoder>
-        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- rollover daily -->
-            <!--如果第二天输出日志,会将当天的日志记录在<file>${log.path}/log_debug.log</file>,然后将昨天的日志归档到下面的文件中-->
-            <!--以分钟切分  %d{yyyy-MM-dd_HH-mm}-->
-            <fileNamePattern>${log.path}/debug/log-debug-%d{yyyy-MM-dd_HH-mm}.%i.log</fileNamePattern>
-            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
-            <!--单个日志文件最大100M，到了这个值，就会再创建一个日志文件，日志文件的名字最后+1-->
-            <maxFileSize>100MB</maxFileSize>
-            <!--日志文件保留天数-->
-            <maxHistory>30</maxHistory>
-            <!--所有的日志文件最大20G，超过就会删除旧的日志-->
-            <totalSizeCap>${size_cap}</totalSizeCap>
-        </rollingPolicy>
-        <!--
-            此日志文件只记录debug级别的
-            onMatch和onMismatch都有三个属性值，分别为Accept、DENY和NEUTRAL
-            onMatch="ACCEPT" 表示匹配该级别及以上
-            onMatch="DENY" 表示不匹配该级别及以上
-            onMatch="NEUTRAL" 表示该级别及以上的，由下一个filter处理，如果当前是最后一个，则表示匹配该级别及以上
-            onMismatch="ACCEPT" 表示匹配该级别以下
-            onMismatch="NEUTRAL" 表示该级别及以下的，由下一个filter处理，如果当前是最后一个，则不匹配该级别以下的
-            onMismatch="DENY" 表示不匹配该级别以下的
-        -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>debug</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-    </appender>
-
     <!-- 时间滚动输出 level为 INFO 日志 -->
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 正在记录的日志文件的路径及文件名 -->
@@ -207,13 +157,13 @@
     <!--生产环境:输出到文件-->
     <springProfile name="pro">
         <root level="info">
-<!--            <appender-ref ref="DEBUG_FILE" />-->
-<!--            <appender-ref ref="INFO_FILE" />-->
             <appender-ref ref="ERROR_FILE" />
             <appender-ref ref="WARN_FILE" />
         </root>
         <logger name="com.example.blog2.service.impl" level="debug" additivity="false">
-<!--            <appender-ref ref="STDOUT" />-->
+            <appender-ref ref="INFO_FILE" />
+        </logger>
+        <logger name="com.example.blog2.websocket" level="debug" additivity="false">
             <appender-ref ref="INFO_FILE" />
         </logger>
     </springProfile>
