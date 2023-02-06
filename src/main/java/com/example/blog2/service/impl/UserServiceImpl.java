@@ -286,6 +286,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         UserEntity user = new UserEntity();
         user.setId(adminVerify.getId());
         user.setType(adminVerify.getType());
+
+        CompletableFuture.runAsync(() -> {
+            user.setLastLoginTime(new Date());
+            updateById(user);
+        }, executor);
         return TokenUtil.sign(user);
     }
 }
