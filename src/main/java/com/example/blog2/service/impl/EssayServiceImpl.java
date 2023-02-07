@@ -30,6 +30,7 @@ import com.example.blog2.entity.EssayEntity;
 import com.example.blog2.service.EssayService;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -160,7 +161,9 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
             log.info("IP：{}，用户[{}], 新增随笔[{}]", IPInterceptor.IP_INFO.get(), essay.getAuthor(), essay.getTitle());
         }
 
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         CompletableFuture.runAsync(() -> {
+            RequestContextHolder.setRequestAttributes(requestAttributes);
             updatePictureBelongEssay(essay.getId());
         }, executor);
 
