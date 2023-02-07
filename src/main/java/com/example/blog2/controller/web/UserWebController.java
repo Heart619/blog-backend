@@ -1,7 +1,6 @@
 package com.example.blog2.controller.web;
 
 import com.example.blog2.constant.ConstantUser;
-import com.example.blog2.entity.UserEntity;
 import com.example.blog2.exception.UserNotFoundException;
 import com.example.blog2.exception.UserPasswordErrorException;
 import com.example.blog2.exception.UserExistsNickNameException;

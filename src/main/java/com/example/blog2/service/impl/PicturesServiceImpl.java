@@ -117,7 +117,7 @@ public class PicturesServiceImpl extends ServiceImpl<PicturesDao, PicturesEntity
         picture.setType(-1);
         save(picture);
         log.info("IP：{}，上传图片", IPInterceptor.IP_INFO.get());
-        return ossConfig.getRegion() + "/" + key;
+        return ossConfig.getAddress() + "/" + key;
     }
 
     @Override

@@ -15,6 +15,7 @@ public class OSSConfig {
     private String bucket;
     private String region;
 
+    private String address;
     private String imgSrc;
     private String textSrc;
     private String otherSrc;
