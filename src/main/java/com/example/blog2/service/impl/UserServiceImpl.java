@@ -1,5 +1,6 @@
 package com.example.blog2.service.impl;
 
+import ch.qos.logback.core.util.LocationUtil;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.blog2.config.TencentServerConfig;
 import com.example.blog2.exception.*;
@@ -92,7 +93,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         }
 
         String ip = IPInterceptor.IP_INFO.get();
-        UserLocationVo locationVo = LocationUtil.getUserLocation(ip);
+        UserLocationVo locationVo = IPUtils.getUserLocation(ip);
         UserEntity user = new UserEntity();
         UserLocationVo.Result result = locationVo.getResult();
         user.setLoginProvince(result.getAd_info().getProvince());
@@ -136,7 +137,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         }
 
         String ip = IPInterceptor.IP_INFO.get();
-        UserLocationVo locationVo = LocationUtil.getUserLocation(ip);
+        UserLocationVo locationVo = IPUtils.getUserLocation(ip);
         UserLocationVo.Result result = locationVo.getResult();
         user.setLoginProvince(result.getAd_info().getProvince());
         user.setLoginCity(result.getAd_info().getCity());

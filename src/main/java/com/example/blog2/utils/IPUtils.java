@@ -1,5 +1,12 @@
 package com.example.blog2.utils;
 
+import com.example.blog2.config.TencentServerConfig;
+import com.example.blog2.vo.UserLocationVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
+
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 
@@ -7,7 +14,15 @@ import java.net.InetAddress;
  * @author mxp
  * @date 2023/1/30 10:09
  */
+@Component
 public class IPUtils {
+
+    private static TencentServerConfig tencentServerConfig;
+
+    @Autowired
+    public void setTencentServerConfig(TencentServerConfig tencentServerConfig) {
+        IPUtils.tencentServerConfig = tencentServerConfig;
+    }
 
     public static String getIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
@@ -23,7 +38,7 @@ public class IPUtils {
                 } catch (Exception e) {
                     e.printStackTrace ();
                 }
-                ip = inet.getHostAddress ();
+                ip = inet.getHostAddress();
             }
         }
 
@@ -43,5 +58,26 @@ public class IPUtils {
             ip = request.getRemoteAddr();
         }
         return ip;
+    }
+
+    public static UserLocationVo getUserLocation(String ip) {
+        RestTemplate restTemplate = new RestTemplate();
+        StringBuilder url = new StringBuilder("https://apis.map.qq.com/ws/location/v1/ip?key=");
+        url.append(tencentServerConfig.getKey());
+        String u = url.toString();
+        if (!StringUtils.isEmpty(ip)) {
+            url.append("&ip=").append(ip);
+        }
+        UserLocationVo object = restTemplate.getForObject(
+                url.toString(),
+                UserLocationVo.class
+        );
+        if (object == null || (object.getResult() == null && object.getStatus().equals(375))) {
+            return restTemplate.getForObject(
+                    u,
+                    UserLocationVo.class
+            );
+        }
+        return object;
     }
 }

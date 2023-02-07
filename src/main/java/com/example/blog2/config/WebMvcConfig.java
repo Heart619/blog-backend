@@ -1,10 +1,12 @@
-package com.example.blog2.interceptor;
+package com.example.blog2.config;
 
 /**
  * @author hikari
  * @version 1.0
  * @date 2021/7/14 15:18
  */
+import com.example.blog2.interceptor.IPInterceptor;
+import com.example.blog2.interceptor.TokenInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
@@ -23,7 +25,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author mxp
  */
 @Configuration
-public class WebConfiguration implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     private TokenInterceptor tokenInterceptor;
@@ -39,6 +41,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         configurer.setTaskExecutor(new ConcurrentTaskExecutor(executors));
         configurer.setDefaultTimeout(30000);
     }
+
 
     @Override
     public void addInterceptors(InterceptorRegistry registry){

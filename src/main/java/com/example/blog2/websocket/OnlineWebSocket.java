@@ -1,5 +1,8 @@
 package com.example.blog2.websocket;
 
+import com.example.blog2.config.WebSocketConfig;
+import com.example.blog2.utils.IPUtils;
+import com.example.blog2.vo.UserLocationVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Component
-@ServerEndpoint("/websocket/online")
+@ServerEndpoint(value = "/websocket/online", configurator = WebSocketConfig.class)
 public class OnlineWebSocket {
 
     private static final AtomicLong ONLINE_USER = new AtomicLong(0L);
@@ -28,8 +31,14 @@ public class OnlineWebSocket {
     @OnOpen
     public void onConnection(Session session) throws IOException {
         this.session = session;
+        Map<String, Object> userProperties = session.getUserProperties();
+        UserLocationVo userLocation = IPUtils.getUserLocation((String) userProperties.get(WebSocketConfig.IP_ADDR));
+
+        this.ip = userLocation.getResult().getIp();
+        UserLocationVo.Ad_info ad_info = userLocation.getResult().getAd_info();
         if (!SESSION_ID_TO_WEBSOCKET.containsKey(this.ip)) {
             ONLINE_USER.incrementAndGet();
+            log.info("~Welcome~ IP：[{}] 位于[{}-{}-{}-{}]访问", this.ip, ad_info.getNation(), ad_info.getProvince(), ad_info.getCity(), ad_info.getDistrict());
         }
         SESSION_ID_TO_WEBSOCKET.put(this.ip, this);
         sendOnlineTotal();
