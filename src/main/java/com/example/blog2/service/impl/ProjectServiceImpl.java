@@ -43,7 +43,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectDao, ProjectEntity> i
                 queryWrapper
         );
 
-        log.info("IP：{}， 分页查询项目信息", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 

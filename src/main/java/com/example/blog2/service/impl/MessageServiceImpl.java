@@ -31,7 +31,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageDao, MessageEntity> i
                 new QueryWrapper<MessageEntity>().orderByDesc("create_time")
         );
 
-//        log.info("IP：{}， 获取留言信息", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 

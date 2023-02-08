@@ -95,7 +95,6 @@ public class EssayServiceImpl extends ServiceImpl<EssayDao, EssayEntity> impleme
             }
         });
 
-        log.info("IP：{}， 随笔信息查询", IPInterceptor.IP_INFO.get());
         return new PageUtils(page);
     }
 
