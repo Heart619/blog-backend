@@ -45,13 +45,10 @@ public class OnlineWebSocket {
     }
 
     private void sendOnlineTotal() throws IOException {
-        Iterator<Map.Entry<String, OnlineWebSocket>> iterator = SESSION_ID_TO_WEBSOCKET.entrySet().iterator();
-        while (iterator.hasNext()) {
-            OnlineWebSocket socket = iterator.next().getValue();
+        for (Map.Entry<String, OnlineWebSocket> stringOnlineWebSocketEntry : SESSION_ID_TO_WEBSOCKET.entrySet()) {
+            OnlineWebSocket socket = stringOnlineWebSocketEntry.getValue();
             if (socket.session.isOpen()) {
                 socket.session.getBasicRemote().sendText(String.valueOf(ONLINE_USER.get()));
-            } else {
-                iterator.remove();
             }
         }
     }
@@ -60,6 +57,7 @@ public class OnlineWebSocket {
     public void onClose() throws IOException {
         if (this.ip == null) return;
         if (SESSION_ID_TO_WEBSOCKET.containsKey(this.ip)) {
+            SESSION_ID_TO_WEBSOCKET.remove(this.ip);
             ONLINE_USER.decrementAndGet();
         }
         sendOnlineTotal();
