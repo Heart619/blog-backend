@@ -9,14 +9,17 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Configuration
-@javax.servlet.annotation.WebFilter(filterName = "sessionFilter", urlPatterns = "/*")
+@javax.servlet.annotation.WebFilter(filterName = "sessionFilter", urlPatterns = "/websocket/*")
 @Order(1)
-public class WebFilter implements Filter {
+public class WebSocketFilter implements Filter {
+
+    public static final ThreadLocal<String> IP_INFO = new ThreadLocal<>();
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
-        req.getSession().setAttribute("ip", IPUtils.getIpAddress(req));
+        IP_INFO.set(IPUtils.getIpAddress(req));
         filterChain.doFilter(servletRequest, servletResponse);
+        IP_INFO.remove();
     }
 }

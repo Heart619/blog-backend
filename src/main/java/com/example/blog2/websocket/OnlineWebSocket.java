@@ -1,6 +1,6 @@
 package com.example.blog2.websocket;
 
-import com.example.blog2.config.WebSocketConfig;
+import com.example.blog2.filter.WebSocketFilter;
 import com.example.blog2.utils.IPUtils;
 import com.example.blog2.vo.UserLocationVo;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -20,7 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Component
-@ServerEndpoint(value = "/websocket/online", configurator = WebSocketConfig.class)
+@ServerEndpoint(value = "/websocket/online")
 public class OnlineWebSocket {
 
     private static final AtomicLong ONLINE_USER = new AtomicLong(0L);
@@ -31,9 +32,7 @@ public class OnlineWebSocket {
     @OnOpen
     public void onConnection(Session session) throws IOException {
         this.session = session;
-        Map<String, Object> userProperties = session.getUserProperties();
-        UserLocationVo userLocation = IPUtils.getUserLocation((String) userProperties.get(WebSocketConfig.IP_ADDR));
-
+        UserLocationVo userLocation = IPUtils.getUserLocation(WebSocketFilter.IP_INFO.get());
         this.ip = userLocation.getResult().getIp();
         UserLocationVo.Ad_info ad_info = userLocation.getResult().getAd_info();
         if (!SESSION_ID_TO_WEBSOCKET.containsKey(this.ip)) {
@@ -45,18 +44,21 @@ public class OnlineWebSocket {
     }
 
     private void sendOnlineTotal() throws IOException {
-        for (Map.Entry<String, OnlineWebSocket> entry : SESSION_ID_TO_WEBSOCKET.entrySet()) {
-            OnlineWebSocket socket = entry.getValue();
+        Iterator<Map.Entry<String, OnlineWebSocket>> iterator = SESSION_ID_TO_WEBSOCKET.entrySet().iterator();
+        while (iterator.hasNext()) {
+            OnlineWebSocket socket = iterator.next().getValue();
             if (socket.session.isOpen()) {
                 socket.session.getBasicRemote().sendText(String.valueOf(ONLINE_USER.get()));
+            } else {
+                iterator.remove();
             }
         }
     }
 
     @OnClose
     public void onClose() throws IOException {
+        if (this.ip == null) return;
         if (SESSION_ID_TO_WEBSOCKET.containsKey(this.ip)) {
-            SESSION_ID_TO_WEBSOCKET.remove(this.ip);
             ONLINE_USER.decrementAndGet();
         }
         sendOnlineTotal();
