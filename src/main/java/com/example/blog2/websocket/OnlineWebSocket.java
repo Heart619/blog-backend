@@ -33,6 +33,7 @@ public class OnlineWebSocket {
     public void onConnection(Session session) throws IOException {
         this.session = session;
         UserLocationVo userLocation = IPUtils.getUserLocation(WebSocketFilter.IP_INFO.get());
+        WebSocketFilter.IP_INFO.remove();
         this.ip = userLocation.getResult().getIp();
         UserLocationVo.Ad_info ad_info = userLocation.getResult().getAd_info();
         if (!SESSION_ID_TO_WEBSOCKET.containsKey(this.ip)) {

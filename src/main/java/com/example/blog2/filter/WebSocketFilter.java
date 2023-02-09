@@ -20,6 +20,5 @@ public class WebSocketFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         IP_INFO.set(IPUtils.getIpAddress(req));
         filterChain.doFilter(servletRequest, servletResponse);
-        IP_INFO.remove();
     }
 }
