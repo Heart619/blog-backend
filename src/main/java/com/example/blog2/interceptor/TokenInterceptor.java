@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -20,6 +22,7 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 /**
  * @author mxp
@@ -30,6 +33,13 @@ import java.util.Set;
 public class TokenInterceptor implements HandlerInterceptor {
 
     public static final ThreadLocal<UserTokenInfo> CUR_USER_INFO =  new ThreadLocal<>();
+
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    private final String[] whitePath = new String[]{
+            "/admin/comment/*/delete",
+            "/admin/message/del/**",
+    };
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)throws Exception{
@@ -45,9 +55,19 @@ public class TokenInterceptor implements HandlerInterceptor {
             boolean result;
             try {
                 UserTokenInfo userTokenInfo = TokenUtil.adminVerify(token);
-                if (userTokenInfo == null) {
-                    return false;
+                String uri = request.getRequestURI();
+                boolean isWhite = false;
+                for (String s : whitePath) {
+                    isWhite = pathMatcher.match(s, uri);
+                    if (isWhite) {
+                        break;
+                    }
                 }
+
+                if (!isWhite && userTokenInfo.getType().equals(0)) {
+                    throw new RuntimeException("非法用户");
+                }
+
                 CUR_USER_INFO.set(userTokenInfo);
                 return true;
             } catch (TokenExpiredException  e) {

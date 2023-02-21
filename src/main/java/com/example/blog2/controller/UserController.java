@@ -1,6 +1,5 @@
 package com.example.blog2.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -90,5 +89,10 @@ public class UserController {
     @PostMapping("/updatePwd")
     public R updatePwd(@RequestBody PasswordUpdateVo vo) throws Exception {
         return R.ok().put("data", userService.updatePwd(vo));
+    }
+
+    @GetMapping("/checkVerify")
+    public R checkVerify() {
+        return R.ok().put("data", userService.checkVerify());
     }
 }

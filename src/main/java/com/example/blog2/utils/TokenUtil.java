@@ -98,13 +98,11 @@ public class TokenUtil {
                     .withIssuer("auth0")
                     .build();
             DecodedJWT jwt = verifier.verify(token);
-            if (jwt.getClaim("userType").asInt() > 0){
-                TokenInterceptor.UserTokenInfo tokenInfo = new TokenInterceptor.UserTokenInfo();
-                tokenInfo.setId(jwt.getClaim("userId").asLong());
-                tokenInfo.setType(jwt.getClaim("userType").asInt());
-                return tokenInfo;
-            }
-            return null;
+            Integer type = jwt.getClaim("userType").asInt();
+            TokenInterceptor.UserTokenInfo tokenInfo = new TokenInterceptor.UserTokenInfo();
+            tokenInfo.setId(jwt.getClaim("userId").asLong());
+            tokenInfo.setType(jwt.getClaim("userType").asInt());
+            return tokenInfo;
         } catch (TokenExpiredException e){
             throw new TokenExpiredException("用户登陆过期，请重新登陆");
         } catch (Exception e) {

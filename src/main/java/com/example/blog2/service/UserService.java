@@ -84,5 +84,11 @@ public interface UserService extends IService<UserEntity> {
      * @return
      */
     String refreshToken();
+
+    /**
+     *
+     * @return
+     */
+    UserEntity checkVerify();
 }
 

@@ -28,4 +28,6 @@ public class UserRecVo {
      *
      */
     private String username;
+
+    private Integer type;
 }

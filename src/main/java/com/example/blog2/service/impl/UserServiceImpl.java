@@ -294,4 +294,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
         }, executor);
         return TokenUtil.sign(user);
     }
+
+    @Override
+    public UserEntity checkVerify() {
+        TokenInterceptor.UserTokenInfo userTokenInfo = TokenInterceptor.CUR_USER_INFO.get();
+        Long id = userTokenInfo.getId();
+        return getById(id);
+    }
+
 }
